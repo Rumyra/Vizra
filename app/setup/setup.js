@@ -1,37 +1,63 @@
+import Vizra from '../../Vizra/Vizra.js';
+// controller setup
 import controls from './midiConfig.js';
+// array of colour palettes
+import palettes from './palettes.js';
+
+// purely here for jsconfeu
+let xCoords = [ [20, 20], [50, 50], [100, 50], [200, 50] ];
 
 /*
 This is a terrible way of doing this
 Everything is happening in here:
 
-Audio anlysis setup
+App setup:
+	Colour palette
+	Shape
+	Parameters for draw function
 
 MIDI setup
 
-Control switching
+Audio anlysis setup
 
+Control switching
 
 TODO: refactor the shit outta this
 */
 
-// Parameter setup - returns midi & analysis values
+// ===================== APP SETUP
 
-var params = new Object();
+const canvasEl = document.querySelector('canvas');
 
-// these go in setup and draw - so we're looking at returning midi channel, midi note, midi velocity
-// remember cc's don't have a note(?)
-params.midi = {};
-params.midi.event = true;
-params.midi.channel =
-params.midi.cc = 45;
-params.midi.on = [];
+const viz = {
 
-// param.analyser.data = [];
-// param.analyser.bass = 100;
-// param.analyser.hi = 100;
-// param.analyser.beat = true;
+	screen: new Vizra.canvas(canvasEl),
 
-//================================ MIDI
+	get grid() {
+		return new Vizra.coords('grid', 'loose');
+	},
+
+	get coords() {
+		return this.grid.coords;
+	},
+
+	get palette() {
+		return palettes[0];
+	},
+
+	// analysis
+	// Check audio part below: returns viz.data, viz.bass, viz.hi
+
+	// midi
+	midi: {}
+	// check onMIDImessage function: we have midi.channel, midi.note & midi.vel
+
+	// get sprite -> this is the function that draws whatever shape you want
+
+}
+
+
+// ================================ MIDI
 // request MIDI access
 if (navigator.requestMIDIAccess) {
     navigator.requestMIDIAccess({
@@ -61,17 +87,198 @@ function onMIDIFailure(error) {
 
 function onMIDIMessage(message) {
 	const data = message.data;
-	var event = new CustomEvent('midi', { detail: data });
 
-	if (data[0] === controls.shapeSwitch) {
-		params.midi.on = data[1];
+	viz.midi.channel = data[0];
+	viz.midi.note = data[1];
+	viz.midi.vel = data[2];
+
+	// if bank one
+	if (data === controls.setOne) {
+		switchViz(data);
 	}
-	if (data[0] === controls.fx) {
-		params.midi.cc = data[2];
+
+	// if bank two
+	if (data === controls.setTwo) {
+		switchViz(data, 2);
+	}
+
+	// if bank three
+	if (data === controls.colourControls) {
+		colourFX(data);
+	}
+
+	// if bank four
+	if (data === controls.shapeControls) {
+		shapeFX(data);
 	}
 }
 
 //======================= AUDIO
+const binSize = 256;
+const audioCtx = new AudioContext({sampleRate: 41000});
+const analyser = new AnalyserNode(audioCtx, {
+	fftSize: binSize*2,
+	maxDecibels: -25,
+	minDecibels: -60,
+	smoothingTimeConstant: 0.5,
+});
+
+let data = new Uint8Array(binSize);
+
+viz.getStreamData = function() {
+	// pipe in analysing to getUserMedia
+	return navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+		.then(stream => audioCtx.createMediaStreamSource(stream))
+		.then(source => {
+			source.connect(analyser);
+		});
+}
+
+viz.getData = function() {
+	analyser.getByteFrequencyData(data);
+	viz.data = data.slice(0, 128);
+	viz.bass = data[16];
+	viz.hi = data[64];
+}
+
+viz.resume = function() {
+	audioCtx.resume;
+}
+
+// ======================== CONTROLS
+function switchViz(message, set = 1) {
+
+	let setStartVal = controls.setOneShape[1];
+	// let set = sets.setOne;
+
+	if (set === 2) {
+		setStartVal = controls.setTwoShape[1]
+		// set = sets.setTwo;
+	};
+
+	// calculate which button from button pressed minus lower value (gives us int 0-15)
+	let index = message[1] - setStartVal;
+	console.log('switch', index);
+
+	viz.sprite = set[index];
+
+}
+
+function colourFX(message) {
+
+	// arcade cc switch up
+	switch (message[1]) {
+
+  	case controls.hueShift:
+  		viz.palette.setHues(message[2]);
+    break;
+
+    case controls.satShift:
+    	viz.palette.setSats(message[2]);
+    break;
+
+    case controls.lumShift:
+    	viz.palette.setLums(message[2]);
+    break;
+
+    case controls.opShift:
+    	viz.palette.setOps(message[2]);
+    break;
+  }
+
+  // invert on and off
+  if (message === controls.invertOn) {
+  	viz.palette.invert;
+  } else if (message === controls.invertOff) {
+  	viz.palette.invert;
+  }
+
+  // palette switcher
+  let paletteStartVal = controls.paletteSwitch[1];
+	// switch case button -> array of sprites
+	switch (message[1]) {
+
+		case paletteStartVal:
+			viz.palette = palettes[0];
+			console.log('palette one')
+		break;
+
+		case (paletteStartVal + 1):
+			viz.palette = palettes[1];
+		break;
+
+		case (paletteStartVal + 2):
+			viz.palette = palettes[2];
+		break;
+
+		case (paletteStartVal + 3):
+			viz.palette = palettes[3];
+		break;
+
+		case (paletteStartVal + 4):
+			viz.palette = palettes[4];
+		break;
+
+		case (paletteStartVal + 5):
+			viz.palette = palettes[5];
+		break;
+
+		case (paletteStartVal + 6):
+			viz.palette = palettes[6];
+		break;
+
+		case (paletteStartVal + 7):
+			viz.palette = palettes[7];
+		break;
+
+	}
+
+	// blackout
+	if (message === controls.blackOut) {
+		viz.palette.setLums = -100;
+	}
+
+	// whiteout
+	if (message === controls.whiteOut) {
+		viz.palette.setLums = 100;
+	}
+
+	// showScreen (reset lums)
+	if (message === controls.showScreen) {
+		viz.palette.resetLums;
+	}
+
+	// reset palette
+	if (message === controls.resetColours) {
+		viz.palette.reset;
+	}
+
+}
+
+function shapeFX(message) {
+
+	// square
+	if (message === controls.squareGrid) {
+		console.log('grid switch');
+		viz.grid.type = 'grid';
+	}
+
+	// triangle
+	if (message === controls.isoGrid) {
+		viz.grid.type = 'grid';
+	}
+
+	// polar
+	if (message === controls.polarGrid) {
+		viz.grid.type = 'grid';
+	}
+
+	// custom -> make this the x for jsconfeu
+	if (message === controls.customGrid) {
+		viz.grid = new Vizra.coords('custom', xCoords);
+	}
+
+}
 
 
 // worker stuff
@@ -81,29 +288,16 @@ function onMIDIMessage(message) {
 //   analysisWorker.postMessage({'freqs': receivedData, 'newCounts': analyserSize});
 // }
 
-// this shuld probably be moved to an audio module
-// TODO create shared array buffer for audio analysis in worker
-// Creating a shared buffer
-const length = 10;
- // Get the size we want in bytes for the buffer
-const size = Int32Array.BYTES_PER_ELEMENT * length;
- // Create a buffer for 10 integers
-const sharedBuffer = new SharedArrayBuffer(size);
-const sharedArray = new Int32Array(sharedBuffer);
+// // this shuld probably be moved to an audio module
+// // TODO create shared array buffer for audio analysis in worker
+// // Creating a shared buffer
+// const length = 10;
+//  // Get the size we want in bytes for the buffer
+// const size = Int32Array.BYTES_PER_ELEMENT * length;
+//  // Create a buffer for 10 integers
+// const sharedBuffer = new SharedArrayBuffer(size);
+// const sharedArray = new Int32Array(sharedBuffer);
 
 
-const events = {
-	// beat: analyser.beat,
 
-	// bpm from audio
-
-	// framerate -> takes framerate in ms and approx framerate of raf
-	framerate: function(ms, fr = 50) {
-		return true;
-	},
-
-	// bpm based on approx framerate
-	bpmFr: []
-}
-
-export default params;
+export default viz;

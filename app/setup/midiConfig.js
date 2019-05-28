@@ -85,15 +85,16 @@ const controls = {
 
 	// bank one is shape switcher
 	setOne: fighter.bankOne.switch,
-	setOneShape: fighter.bankOne.arcade[0], // lowest value for buttons
+	setOneShape: fighter.bankOne.arcade[0].on, // lowest value for buttons
 	setOneReset: fighter.bankOne.side.left[2].on,
 
 	// bank two is shape switcher
 	setTwo: fighter.bankTwo.switch,
-	setTwoShape: fighter.bankTwo.arcade[0], // lowest value for buttons
+	setTwoShape: fighter.bankTwo.arcade[0].on, // lowest value for buttons
 	setTwoReset: fighter.bankTwo.side.left[2].on,
 
 	// bank three is for colours
+	colourControls: fighter.bankThree.switch,
 	// returns cc vals
 	hueShift: fighter.bankThree.arcade[3].cc[1],
 	satShift: fighter.bankThree.arcade[2].cc[1],
@@ -103,7 +104,7 @@ const controls = {
 	invertOn: fighter.bankThree.arcade[7].on,
 	invertOff: fighter.bankThree.arcade[7].off,
 
-	paletteSwitch: fighter.bankThree.arcade[8], // lowest value for buttons
+	paletteSwitch: fighter.bankThree.arcade[8].on, // lowest value for buttons
 
 	blackOut: fighter.bankThree.side.right[0].on,
 	whiteOut: fighter.bankThree.side.right[1].on,
@@ -112,6 +113,7 @@ const controls = {
 	resetColours: fighter.bankThree.side.left[2].on,
 
 	// bank four is for grid & transforms
+	shapeControls: fighter.bankFour.switch,
 	// I literally have no idea how to do grids
 	squareGrid: fighter.bankFour.arcade[3].on,
 	isoGrid: fighter.bankFour.arcade[2].on,

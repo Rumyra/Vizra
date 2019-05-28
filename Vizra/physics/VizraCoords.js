@@ -30,6 +30,10 @@ class VizraCoords {
 		this.coords = this.getCoords(this._type);
 	}
 
+	set type(type) {
+		this._type = type;
+	}
+
 	get _screenWidth() {
 		return window.innerWidth;
 	}
