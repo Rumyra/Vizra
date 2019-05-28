@@ -18,7 +18,8 @@ const screenOne = new Vizra.canvas(canvasEl);
 // set grid, palette & shape using controls
 // you can have more than one shape
 // grid
-let grid = new Vizra.coords('grid', [40, 40]);
+let coords = new Vizra.coords('custom', [ [40, 40], [100, 100], [200, 200], [400, 400] ]);
+let grid = coords.coords;
 // palette (jsconf2019)
 const cols = [
 	new Vizra.colour('#F3ECDA'), // cream
@@ -45,9 +46,13 @@ function xTileOne() {
 // viz function
 let frame = 0;
 let debounce = 25;
+let debounceCount = 0;
 function viz(params) {
 
-	if (frame === debounce) {
+	coords.randomiseGrid();
+
+
+	if (debounceCount === debounce) {
 		screenOne.clear(palette.back);
 
 		// palette.setHues(params.hi);
@@ -64,17 +69,19 @@ function viz(params) {
 			shape.scale = {x: shapeScale, y: shapeScale};
 
 
-			if ( (canDraw < 0.7) && (i%3 === 0) ) {
+			if ( (canDraw < 1) && (i%3 === 0) ) {
 				shape.draw(screenOne.ctx);
 				// xTileOne();
 			}
 
 		})
 
-		frame = 0;
+		debounceCount = 0;
 	} else {
-		frame++;
+		debounceCount++;
 	}
+
+	frame++;
 }
 
 // AUDIO TEST ================

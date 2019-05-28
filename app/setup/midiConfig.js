@@ -28,6 +28,7 @@ function generateArcadeVals(bank) {
 const fighter = {
 
 	bankOne: {
+		switch: [147, 0, 127],
 		arcade: generateArcadeVals(0),
 		side: {
 			left: [ {on: [147, 26, 127], off: [131, 26, 127]}, {on: [147, 27, 127], off: [131, 27, 127]}, {on: [147, 28, 127], off: [131, 28, 127]} ],
@@ -36,6 +37,7 @@ const fighter = {
 	},
 
 	bankTwo: {
+		switch: [147, 1, 127],
 		arcade: generateArcadeVals(1),
 		side: {
 			left: [ {on: [147, 26, 127], off: [131, 26, 127]}, {on: [147, 27, 127], off: [131, 27, 127]}, {on: [147, 28, 127], off: [131, 28, 127]} ],
@@ -44,6 +46,7 @@ const fighter = {
 	},
 
 	bankThree: {
+		switch: [147, 2, 127],
 		arcade: generateArcadeVals(2),
 		side: {
 			left: [ {on: [147, 26, 127], off: [131, 26, 127]}, {on: [147, 27, 127], off: [131, 27, 127]}, {on: [147, 28, 127], off: [131, 28, 127]} ],
@@ -52,6 +55,7 @@ const fighter = {
 	},
 
 	bankFour: {
+		switch: [147, 3, 127],
 		arcade: generateArcadeVals(3),
 		side: {
 			left: [ {on: [147, 26, 127], off: [131, 26, 127]}, {on: [147, 27, 127], off: [131, 27, 127]}, {on: [147, 28, 127], off: [131, 28, 127]} ],
@@ -76,26 +80,43 @@ const fighter = {
 
 console.log(fighter.bankOne.arcade);
 
-// let's be more specific here - what are the controls we want?
-/*
-
-
-*/
+// See cheat sheets
 const controls = {
-	// expand to set one set two
 
-	// returns set one channel
-	setOne
-	shapeSwitch: fighter.bankOne.arcade[0].on[0],
+	// bank one is shape switcher
+	setOne: fighter.bankOne.switch,
+	setOneShape: fighter.bankOne.arcade[0], // lowest value for buttons
+	setOneReset: fighter.bankOne.side.left[2].on,
 
-	// returns set two channel
+	// bank two is shape switcher
+	setTwo: fighter.bankTwo.switch,
+	setTwoShape: fighter.bankTwo.arcade[0], // lowest value for buttons
+	setTwoReset: fighter.bankTwo.side.left[2].on,
 
-	// returns FX one switch channel
+	// bank three is for colours
+	// returns cc vals
+	hueShift: fighter.bankThree.arcade[3].cc[1],
+	satShift: fighter.bankThree.arcade[2].cc[1],
+	lumShift: fighter.bankThree.arcade[1].cc[1],
+	opShift: fighter.bankThree.arcade[0].cc[1],
 
-	// returns FX one cc channel
+	invertOn: fighter.bankThree.arcade[7].on,
+	invertOff: fighter.bankThree.arcade[7].off,
 
-	// expand to invert hue etc...
-	fx: fighter.bankThree.arcade[0].cc[0]
+	paletteSwitch: fighter.bankThree.arcade[8], // lowest value for buttons
+
+	blackOut: fighter.bankThree.side.right[0].on,
+	whiteOut: fighter.bankThree.side.right[1].on,
+	showScreen: fighter.bankThree.side.right[2].on,
+
+	resetColours: fighter.bankThree.side.left[2].on,
+
+	// bank four is for grid & transforms
+	// I literally have no idea how to do grids
+	squareGrid: fighter.bankFour.arcade[3].on,
+	isoGrid: fighter.bankFour.arcade[2].on,
+	polarGrid: fighter.bankFour.arcade[1].on,
+	customGrid: fighter.bankFour.arcade[0].on
 }
 
 export default controls;
