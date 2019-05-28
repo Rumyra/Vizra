@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Vizra library</title>
+</head>
+<body>
+	<h1>Vizra Parts</h1>
+	<p>You create <i>Viz</i>; individual 'tracks', which you put together to create sets, which are then played live.</p>
+	<p>There are helper libraries to create Viz: Colour, distribution (remember polar for this), sound and shape drawing. There's an extra Vizra utilities library with math helpers and such in.</p>
+	<p>There's global setup: Screen, control, FX & params and library. Colours and FX & params can be global and over-ridden locally for each Viz</p>
+	<p>Each Viz draws something on the screen, essentially the drawing function, or new Viz {params}, draw(new Viz type) - new Viz params can be anything, and controlled by anything Vizra.data.analyser Vizra.data.MIDI I still think there needs to be some sort of timing functions - and all these things amount to numbers</p>
+	analyser returns audio data - ranges from 0-255 - MIDI returns press & cc - returns 0-127 there's also on off for both if you inclde beat for audio. Timing in frames is on or off - events: midi.press[0] 
+	<p>See http://usejsdoc.org/ for documentation generation</p>
+</body>
+</html>

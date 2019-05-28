@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="coords.css">
+	<title>Vizra Coords</title>
+</head>
+<body>
+	<header>
+		<h2>Vizra.coords</h2>
+		<h4>Get coordinates for shape distribution</h4>
+	</header>
+	
+	<section class="grid">
+		<h3>Grid</h3>
+		<p>Pass in 'grid', 'iso', 'polar' ('random'?) - screen width and height can be found in class, grid width & height are set in pixels or 'tight', 'even', 'loose', extendEdges = true </p>
+		<p class="code">new VizraCoords{type, {gridSize or distrib keyword}, extendEdges = true}</p>
+		<p>This gives you a loose triangular grid with borders</p>
+		<p class="code">new VizraCoords('grid', [40, 40])</p>
+		<canvas></canvas>
+	</section>
+	
+	<section class="iso">
+		<h3>Iso</h3>
+		<p class="code">new VizraCoords('iso', 'loose', false)</p>
+		<canvas></canvas>
+	</section>
+	
+	<section class="polar">
+		<h3>Polar</h3>
+		<p class="code">new VizraCoords('polar', 'even')</p>
+		<canvas></canvas>
+	</section>
+		
+	<script src="coords.js" type="module"></script>
+	
+</body>
+</html>
