@@ -1,5 +1,19 @@
 import controls from './midiConfig.js';
 
+/*
+This is a terrible way of doing this
+Everything is happening in here:
+
+Audio anlysis setup
+
+MIDI setup
+
+Control switching
+
+
+TODO: refactor the shit outta this
+*/
+
 // Parameter setup - returns midi & analysis values
 
 var params = new Object();
