@@ -20,6 +20,7 @@ const vizraUtils = {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 	},
+	// TODO make this a map function -> map(val, startRange, endRange)
 	// input val between 0-255 & return val 0-1
 	normaliseData: function(dataVal) {
 		return dataVal/255;
