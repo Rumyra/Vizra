@@ -1,4 +1,5 @@
 import vizraUtils from '../vizraUtils.js';
+import VizraVector from '../physics/VizraVector.js';
 
 // all shapes have dimensions: dim{} and styles: style{} passed in
 // all have an extra shape specific options{}
@@ -36,65 +37,47 @@ class VizraShape {
 	// path is a Path2D object -> this may have to be VizraShape with colours
 	// position is a vizra vector
 	// palette is a colour scheme
-	constructor(position, path, fill, stroke, scale = {x: 1, y: 1}, rotate = 0, strokeWidth = 0.0) {
+	constructor(position, path, palette) {
+		this.position = position;
+		this.path = path;
+		this.fill = palette.back.hsla;
+		this.stroke = palette.fore.hsla;
 
-		this._position = position;
-		this._path = path;
-		this._fill = fill;
-		this._stroke = stroke;
-		this._scale = scale;
-		this._rotate = vizraUtils.degToRad(rotate);
-		this._strokeWidth = strokeWidth;
+		this.scale = new VizraVector(1, 1);
+		this.strokeWidth = 0.0;
 
-	}
+		this.offset = {x: 1, y: 1};
 
-	draw(context) {
-		// context.save();
-
-		context.fillStyle = this._fill;
-		context.lineWidth = this._strokeWidth;
-		context.strokeStyle = this._stroke;
-
-		// console.log(this._position.x, this._position.y);
-		// context.translate(this._position.x, this._position.y);
-		context.translate(this._position.x, this._position.y);
-		// context.rotate(this._rotate);
-		// context.scale(this._scale.x, this._scale.y);
-
-		context.fill(this._path);
-		context.stroke(this._path);
-
-		// context.resetTransform();
-		// context.restore();
-	}
-
-	set move(vector) {
-		return this._position = vector;
-	}
-
-	set path(path) {
-		return this._path = path;
-	}
-
-	set fill(colour) {
-		return this._fill = colour;
-	}
-
-	set stroke(colour) {
-		return this._stroke = colour;
-	}
-
-	set scale(scale) {
-		return this._scale = scale;
 	}
 
 	set rotate(deg) {
-		return this._rotate = vizraUtils.degToRad(deg);
+		let rads = vizraUtils.degToRad(deg);
+		return this._rotate = rads;
 	}
 
-	set strokeWidth(width) {
-		return this._strokeWidth = width;
+	get rotate() {
+		return this._rotate;
 	}
+
+	draw(context) {
+		context.save();
+
+		context.fillStyle = this.fill;
+		context.lineWidth = this.strokeWidth;
+		context.strokeStyle = this.stroke;
+
+		context.translate(this.position.x-(this.offset.x*this.scale.x), this.position.y-(this.offset.y*this.scale.y));
+		// ctx.translate(position.x-(107*scale), position.y-(122*scale));
+		context.rotate(this.rotate);
+		context.scale(this.scale.x, this.scale.y);
+
+		context.fill(this.path);
+		context.stroke(this.path);
+
+		context.resetTransform();
+		context.restore();
+	}
+
 }
 
 // let's just stick with an object that returns 2DPaths - I'll refactor Vizra - there's an element here for an over-riding library (RAH) which has draw, canvas, maybe colours - anything shared between the two -> or just encorporate Phyzra into Vizra eventually

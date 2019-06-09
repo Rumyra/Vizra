@@ -6,6 +6,7 @@ import VizraVector from './physics/VizraVector.js';
 import VizraCoords from './physics/VizraCoords.js';
 import VizraColour from './colour/VizraColour.js';
 import VizraPalette from './colour/VizraPalette.js';
+import Viz from './Viz.js';
 
 // import VizraAnalyser from './audio/vizraAnalyser.js';
 
@@ -20,6 +21,7 @@ Vizra.vector = VizraVector;
 Vizra.coords = VizraCoords;
 Vizra.colour = VizraColour;
 Vizra.palette = VizraPalette;
+Vizra.viz = Viz;
 
 // I'm not using this atm
 // Vizra.analyser = VizraAnalyser;

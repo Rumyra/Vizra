@@ -31,8 +31,8 @@ const fighter = {
 		switch: [147, 0, 127],
 		arcade: generateArcadeVals(0),
 		side: {
-			left: [ {on: [147, 26, 127], off: [131, 26, 127]}, {on: [147, 27, 127], off: [131, 27, 127]}, {on: [147, 28, 127], off: [131, 28, 127]} ],
-			right: [ {on: [147, 29, 127], off: [131, 29, 127]}, {on: [147, 30, 127], off: [131, 30, 127]}, {on: [147, 31, 127], off: [131, 31, 127]} ]
+			left: [ {on: [147, 20, 127], off: [131, 20, 127]}, {on: [147, 21, 127], off: [131, 21, 127]}, {on: [147, 22, 127], off: [131, 22, 127]} ],
+			right: [ {on: [147, 23, 127], off: [131, 23, 127]}, {on: [147, 24, 127], off: [131, 24, 127]}, {on: [147, 25, 127], off: [131, 25, 127]} ]
 		}
 	},
 
@@ -49,8 +49,8 @@ const fighter = {
 		switch: [147, 2, 127],
 		arcade: generateArcadeVals(2),
 		side: {
-			left: [ {on: [147, 26, 127], off: [131, 26, 127]}, {on: [147, 27, 127], off: [131, 27, 127]}, {on: [147, 28, 127], off: [131, 28, 127]} ],
-			right: [ {on: [147, 29, 127], off: [131, 29, 127]}, {on: [147, 30, 127], off: [131, 30, 127]}, {on: [147, 31, 127], off: [131, 31, 127]} ]
+			left: [ {on: [147, 32, 127], off: [131, 32, 127]}, {on: [147, 33, 127], off: [131, 33, 127]}, {on: [147, 34, 127], off: [131, 34, 127]} ],
+			right: [ {on: [147, 35, 127], off: [131, 35, 127]}, {on: [147, 36, 127], off: [131, 36, 127]}, {on: [147, 37, 127], off: [131, 37, 127]} ]
 		}
 	},
 
@@ -58,8 +58,8 @@ const fighter = {
 		switch: [147, 3, 127],
 		arcade: generateArcadeVals(3),
 		side: {
-			left: [ {on: [147, 26, 127], off: [131, 26, 127]}, {on: [147, 27, 127], off: [131, 27, 127]}, {on: [147, 28, 127], off: [131, 28, 127]} ],
-			right: [ {on: [147, 29, 127], off: [131, 29, 127]}, {on: [147, 30, 127], off: [131, 30, 127]}, {on: [147, 31, 127], off: [131, 31, 127]} ]
+			left: [ {on: [147, 38, 127], off: [131, 38, 127]}, {on: [147, 39, 127], off: [131, 39, 127]}, {on: [147, 40, 127], off: [131, 40, 127]} ],
+			right: [ {on: [147, 41, 127], off: [131, 41, 127]}, {on: [147, 42, 127], off: [131, 42, 127]}, {on: [147, 43, 127], off: [131, 43, 127]} ]
 		}
 	},
 
@@ -96,6 +96,7 @@ const controls = {
 	// bank three is for colours
 	colourControls: fighter.bankThree.switch,
 	// returns cc vals
+	colourCCchannel: fighter.bankThree.arcade[0].cc,
 	hueShift: fighter.bankThree.arcade[3].cc[1],
 	satShift: fighter.bankThree.arcade[2].cc[1],
 	lumShift: fighter.bankThree.arcade[1].cc[1],
@@ -115,10 +116,15 @@ const controls = {
 	// bank four is for grid & transforms
 	shapeControls: fighter.bankFour.switch,
 	// I literally have no idea how to do grids
-	squareGrid: fighter.bankFour.arcade[3].on,
+	randomiseGrid: fighter.bankFour.arcade[0].on,
+	squareGrid: fighter.bankFour.arcade[1].on,
 	isoGrid: fighter.bankFour.arcade[2].on,
-	polarGrid: fighter.bankFour.arcade[1].on,
-	customGrid: fighter.bankFour.arcade[0].on
+	polarGrid: fighter.bankFour.arcade[3].on,
+
+	customGridOne: fighter.bankFour.arcade[4].on,
+	customGridTwo: fighter.bankFour.arcade[5].on,
+	customGridThree: fighter.bankFour.arcade[6].on,
+	customGridFour: fighter.bankFour.arcade[7].on
 }
 
 export default controls;

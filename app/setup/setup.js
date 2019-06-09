@@ -3,6 +3,8 @@ import Vizra from '../../Vizra/Vizra.js';
 import controls from './midiConfig.js';
 // array of colour palettes
 import palettes from './palettes.js';
+// viz library
+import vizLibrary from './vizLibrary.js';
 
 // purely here for jsconfeu
 let xCoords = [ [20, 20], [50, 50], [100, 50], [200, 50] ];
@@ -27,34 +29,17 @@ TODO: refactor the shit outta this
 
 // ===================== APP SETUP
 
-const canvasEl = document.querySelector('canvas');
+let viz = vizLibrary[0];
 
-const viz = {
+// 	// analysis
+// 	// Check audio part below: returns viz.data, viz.bass, viz.hi
 
-	screen: new Vizra.canvas(canvasEl),
+// 	// midi
+// 	midi: {},
+// 	// check onMIDImessage function: we have midi.channel, midi.note & midi.vel
 
-	get grid() {
-		return new Vizra.coords('grid', 'loose');
-	},
-
-	get coords() {
-		return this.grid.coords;
-	},
-
-	get palette() {
-		return palettes[0];
-	},
-
-	// analysis
-	// Check audio part below: returns viz.data, viz.bass, viz.hi
-
-	// midi
-	midi: {}
-	// check onMIDImessage function: we have midi.channel, midi.note & midi.vel
-
-	// get sprite -> this is the function that draws whatever shape you want
-
-}
+// 	// get sprite -> this is the function that draws whatever shape you want
+// }
 
 
 // ================================ MIDI
@@ -85,32 +70,48 @@ function onMIDIFailure(error) {
     console.log("No access to MIDI devices or your browser doesn't support WebMIDI API. Please use WebMIDIAPIShim " + error);
 }
 
+let set = 1;
 function onMIDIMessage(message) {
 	const data = message.data;
 
-	viz.midi.channel = data[0];
-	viz.midi.note = data[1];
-	viz.midi.vel = data[2];
+	// viz.midi.channel = data[0];
+	// viz.midi.note = data[1];
+	// viz.midi.vel = data[2];
+
+	console.log(data);
 
 	// if bank one
-	if (data === controls.setOne) {
-		switchViz(data);
+	if (data[0] === controls.setOne[0] && data[1] === controls.setOne[1]) {
+		// switchViz(data);
+		set = 1;
+	} else if (data[0] === controls.setTwo[0] && data[1] === controls.setTwo[1]) {
+		set = 2;
+	} else if (data[0] === controls.colourControls[0] && data[1] === controls.colourControls[1]) {
+		set = 3;
+	} else if (data[0] === controls.shapeControls[0] && data[1] === controls.shapeControls[1]) {
+		set = 4;
 	}
 
-	// if bank two
-	if (data === controls.setTwo) {
-		switchViz(data, 2);
-	}
+	// arcade cc switch up
+	switch (set) {
 
-	// if bank three
-	if (data === controls.colourControls) {
-		colourFX(data);
-	}
+  	case 1:
+  		switchViz(data);
+    break;
 
-	// if bank four
-	if (data === controls.shapeControls) {
-		shapeFX(data);
-	}
+    case 2:
+  		switchViz(data, 2);
+    break;
+
+    case 3:
+  		colourFX(data);
+    break;
+
+    case 4:
+  		shapeFX(data);
+    break;
+  }
+
 }
 
 //======================= AUDIO
@@ -149,18 +150,12 @@ viz.resume = function() {
 function switchViz(message, set = 1) {
 
 	let setStartVal = controls.setOneShape[1];
-	// let set = sets.setOne;
-
-	if (set === 2) {
-		setStartVal = controls.setTwoShape[1]
-		// set = sets.setTwo;
-	};
 
 	// calculate which button from button pressed minus lower value (gives us int 0-15)
 	let index = message[1] - setStartVal;
 	console.log('switch', index);
 
-	viz.sprite = set[index];
+	viz = vizLibrary[index];
 
 }
 
@@ -199,20 +194,20 @@ function colourFX(message) {
 	switch (message[1]) {
 
 		case paletteStartVal:
-			viz.palette = palettes[0];
+			viz.palette = palettes.jseuAll;
 			console.log('palette one')
 		break;
 
 		case (paletteStartVal + 1):
-			viz.palette = palettes[1];
+			viz.palette = palettes.jseuSome;
 		break;
 
 		case (paletteStartVal + 2):
-			viz.palette = palettes[2];
+			viz.palette = palettes.liveJS;
 		break;
 
 		case (paletteStartVal + 3):
-			viz.palette = palettes[3];
+			viz.palette = palettes.rainbow;
 		break;
 
 		case (paletteStartVal + 4):
