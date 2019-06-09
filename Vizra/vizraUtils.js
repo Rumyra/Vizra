@@ -22,6 +22,10 @@ const vizraUtils = {
 	},
 	// TODO make this a map function -> map(val, startRange, endRange)
 	// input val between 0-255 & return val 0-1
+	mapData(val, firstRange, lastRange) {
+		return Number((lastRange/firstRange)*val).toFixed(2);
+	},
+
 	normaliseData: function(dataVal) {
 		return dataVal/255;
 	},

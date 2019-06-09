@@ -30,6 +30,10 @@ class VizraCoords {
 		this.coords = this.getCoords(this._type);
 	}
 
+	set type(type) {
+		this._type = type;
+	}
+
 	get _screenWidth() {
 		return window.innerWidth;
 	}
@@ -61,10 +65,10 @@ class VizraCoords {
 	_calculateGridSize(howRelaxed, x = true) {
 
 		// percentage of space between grid items
-		let space = 6;
+		let space = 8;
 
 		if (howRelaxed === 'tight') {
-			space = 3;
+			space = 4;
 		} else if (howRelaxed === 'loose') {
 			space = 12;
 		}

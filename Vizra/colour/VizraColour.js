@@ -7,32 +7,32 @@
 class VizraColour {
 	constructor(col) {
 		this._hex = col;
-		
+
 		this.col = this._makeHsla(this._hex);
-		
+
 		// return this.col;
 	}
-	
+
 	get original() {
 		return this._makeHsla(this._hex);
 	}
-	
+
 	get hue() {
 		return this.col.hue;
 	}
-	
+
 	get sat() {
 		return this.col.sat;
 	}
-	
+
 	get lum() {
 		return this.col.lum;
 	}
-	
+
 	get op() {
 		return this.col.op;
 	}
-	
+
 	// The descision is: Is this a colour that's returned with the class, or a method that you can call on a colour that changes the colour forever
 	get invert() {
 		// only need to change hue and lum
@@ -40,15 +40,15 @@ class VizraColour {
 		if (invertHue < 0) {
 			invertHue += 360;
 		}
-		
+
 		let invertLum = 100 - this.col.lum;
-		
+
 		this.col.hue = invertHue;
 		this.col.lum = invertLum;
-		
-		return this.col;		
+
+		return this.col;
 	}
-	
+
 	// set hue
 	set hue(val) {
 		// correct val
@@ -58,10 +58,10 @@ class VizraColour {
 			val = 360;
 		}
 		this.col.hue = val;
-		
+
 		return this.col.hue;
 	}
-	
+
 	// set sat
 	set sat(val) {
 		if (val < 0) {
@@ -71,7 +71,7 @@ class VizraColour {
 		}
 		this.col.sat = val;
 	}
-	
+
 	// set light
 	set lum(val) {
 		if (val < 0) {
@@ -81,7 +81,7 @@ class VizraColour {
 		}
 		this.col.lum = val;
 	}
-	
+
 	// set op
 	set op(val) {
 		if (val < 0.0) {
@@ -91,7 +91,7 @@ class VizraColour {
 		}
 		this.col.op = val;
 	}
-	
+
 	// returns formatted hsla string for use
 	get hsla() {
 		// return 'hello';
@@ -101,7 +101,7 @@ class VizraColour {
 	// takes a hex value and returns it's hsla
 	_makeHsla(hex) {
 		let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		
+
 		if (result === null) {
 			this._returnError('hex value not recognised');
 		}
@@ -132,18 +132,18 @@ class VizraColour {
     l = l*100;
     l = Math.round(l);
 		h = Math.round(360*h);
-		
+
 		let col = {
 			hue: h,
 			sat: s,
 			lum: l,
 			op: 1
 		}
-		
+
 		return col;
 	}
-	
-	
+
+
 }
 
 export default VizraColour;
