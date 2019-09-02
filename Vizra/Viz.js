@@ -8,7 +8,7 @@ const vizScreen = new VizraCanvas(canvasEl);
 
 class Viz {
 	constructor(palette, path, params = true, screen = vizScreen) {
-		this.grid = new VizraCoords('grid', 'loose');
+		this.grid = new VizraCoords('square', 'loose');
 		this.palette = palette;
 		this.path = path;
 
@@ -36,7 +36,7 @@ class Viz {
 	drawViz(state) {
 		if (this.debounceCount === this.debounce) {
 
-			this.screen.clear(this.palette.back);
+			this.screen.clear(this.palette.back.hsla);
 
 			this.loop(state);
 

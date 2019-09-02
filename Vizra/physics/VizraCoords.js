@@ -17,6 +17,10 @@ import VizraVector from './VizraVector.js';
 	* new VizraCoords // returns [{x: 10, y: 10}, {x: 20, y: 20}]
 */
 
+// TODO pass in an object of options so we can test to see if they are there
+// add in some nice error handling
+// This will eventually create a cluster of vi rather than just coords
+
 class VizraCoords {
 
 	constructor(type, distrib, extendEdges = true) {
@@ -24,22 +28,23 @@ class VizraCoords {
 		this._distrib = distrib;
 		this._extendEdges = extendEdges;
 
+		this._resize();
+		window.addEventListener("resize", () => {
+			this._resize();
+			this.coords = this.getCoords(this._type);
+		}, false)
+
 		this._xSize = this.xGridSize;
 		this._ySize = this.yGridSize;
 
 		this.coords = this.getCoords(this._type);
+
 	}
 
-	set type(type) {
-		this._type = type;
-	}
-
-	get _screenWidth() {
-		return window.innerWidth;
-	}
-
-	get _screenHeight() {
-		return window.innerHeight;
+	_resize() {
+		const dpr = window.devicePixelRatio;
+		this._screenWidth = window.innerWidth;
+		this._screenHeight = window.innerHeight;
 	}
 
 	get xGridSize() {
@@ -62,7 +67,7 @@ class VizraCoords {
 
 	}
 
-	_calculateGridSize(howRelaxed, x = true) {
+	_calculateGridSize(howRelaxed, dim = 'x') {
 
 		// percentage of space between grid items
 		let space = 8;
@@ -71,14 +76,16 @@ class VizraCoords {
 			space = 4;
 		} else if (howRelaxed === 'loose') {
 			space = 12;
+		} else if (howRelaxed === 'sloppy') {
+			space = 18;
 		}
 
 		// square?
 		// let's start with square and we can add y later
-		if (x) {
-			return Math.ceil(this._screenWidth/100 * space);
-		} else {
-			return Math.ceil(this._screenWidth/100 * space);
+		if (dim === 'x') {
+			return Math.round(this._screenWidth/100 * space);
+		} else if (dim === 'y') {
+			return Math.round(this._screenWidth/100 * space);
 		}
 
 	}
@@ -87,7 +94,7 @@ class VizraCoords {
 
 		const coords = [];
 
-		if (type === 'grid') {
+		if (type === 'square') {
 			// console.log(this._ySize);
 			if (this._extendEdges) {
 				for (let y=0; y<this._screenHeight+this._ySize; y+=this._ySize) {
@@ -96,8 +103,8 @@ class VizraCoords {
 					}
 				}
 			} else {
-				for (let y=this._ySize*2; y<this._screenHeight-(this._ySize*3); y+=this._ySize) {
-					for (let x=this._xSize*2; x<this._screenWidth-(this._xSize*3); x+=this._xSize) {
+				for (let y=this._ySize*1.67; y<this._screenHeight-(this._ySize); y+=this._ySize) {
+					for (let x=this._xSize*1.67; x<this._screenWidth-(this._xSize); x+=this._xSize) {
 							coords.push( new VizraVector(x, y) );
 					}
 				}
@@ -113,17 +120,19 @@ class VizraCoords {
 			let maxHeight = this._screenHeight+halfYSize;
 			let maxWidth = this._screenWidth+halfXSize;
 			if (this._extendEdges === false) {
-				yStart = halfYSize*2;
-				xStart = halfXSize*2;
-				maxHeight = this._screenHeight-(halfYSize*3);
-				maxWidth = this._screenWidth-(halfXSize*3);
+				yStart = halfYSize*1.34;
+				xStart = halfXSize*1.34;
+				maxHeight = this._screenHeight-(halfYSize);
+				maxWidth = this._screenWidth-(halfXSize);
 			}
 
 			for (let y=yStart; y<maxHeight; y+=halfYSize) {
 
 				for (let x=xStart; x<maxWidth; x+=halfXSize) {
+					const xRounded = Math.floor(x/halfXSize);
+					const yRounded = Math.floor(y/halfYSize);
 					// both x & y are odd OR both x & y are even, push coords
-					if ( ((x/halfXSize)%2 === 0 && (y/halfYSize)%2 === 0) || ((x/halfXSize)%2 === 1 && (y/halfYSize)%2 === 1) ) {
+					if ( (xRounded%2 === 0 && yRounded%2 === 0) || (xRounded%2 === 1 && yRounded%2 === 1) ) {
 						coords.push( new VizraVector(x, y) );
 					}
 				}
@@ -139,14 +148,23 @@ class VizraCoords {
 			// y is radius, x is theta (needs to normalise to within 360)
 			let x = 0;
 			let y = 0;
+
+			// set max width for first ring loop
+			const maxWidth = this._screenWidth+this._ySize;
+
 			// jump r -> circles -> extend to screen width
-			for (let r=0; r<this._screenWidth+this._ySize; r+=this._ySize) {
+			for (let r=0; r<maxWidth; r+=this._ySize) {
 				// jump theta o -> angle of distrib -> no bigger than 360
-					for (let o=0; o<361; o+=this._xSize) {
+				const abc = Math.floor(maxWidth/this._ySize);
+				// y = a * cos(2 pi x / b) + c // where a = 13, b = 26, c = 260
+				// const oGap = 360/Math.abs(abc * ( Math.cos( (2*Math.PI*r) / (abc*20) ) )+abc);
+				const oGap = 360/Math.abs(r*abc/100);
+				// console.log(360/Math.abs(r*abc/100));
+					for (let o=1; o<360; o+=oGap) {
 						let rad = vizraUtils.degToRad(o)
 						x = (r * Math.cos(rad)) + xOffset;
 						y = (r * Math.sin(rad)) + yOffset;
-						coords.push( new VizraVector(x, y) );
+						coords.push( new Entity(x, y) );
 					}
 			} // for
 
@@ -157,11 +175,19 @@ class VizraCoords {
 			} )
 
 		} else {
-			throw new Error('Grid type must be grid, iso or polar');
+			throw new Error('Grid type must be square, iso, polar or custom');
 		}
 
 		return coords;
 	}
+
+	// return square coords
+
+	// return iso coords
+
+	// return polar coords
+
+	// return spiral coords
 
 	scaleGrid(vector = new VizraVector(1, 1)) {
 

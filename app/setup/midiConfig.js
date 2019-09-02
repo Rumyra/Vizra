@@ -78,14 +78,59 @@ const fighter = {
 
 };
 
-console.log(fighter.bankOne.arcade);
+// akai.bankOne[0].on -> pad on
+// akai.bankOne[0].off -> pad release
+// akai.bankOne[0].cc -> cc
+// akai.bankOne[0].pc -> program ch
+
+// generate all values
+function generateAkaiVals(bank) {
+
+	// pad channel val
+	const padChOn = 144 + bank;
+	const padChOff = 128 + bank;
+
+	// pad note vals
+	const padNotes = 36;
+
+	// cc channel vals
+	const ccCh = 176 + bank; // notes 1-8
+
+	// pc channel vals
+	const pcCh = 192 + bank; // notes 0-7
+
+	// bank one = 0
+	// const startVal = 16*bank;
+
+	const vals = [];
+
+	for (let i=0; i<8; i++) {
+		var toPush = {
+			on: [padChOn, padNotes+i],
+			off: [padChOff, padNotes+i],
+			cc: [ccCh, i+1],
+			pc: [pcCh, i]
+		};
+		vals.push(toPush);
+	}
+	return vals;
+}
+
+
+const akai = {
+	bankOne: generateAkaiVals(0),
+	bankTwo: generateAkaiVals(1),
+	bankThree: generateAkaiVals(2),
+	bankFour: generateAkaiVals(3)
+};
 
 // See cheat sheets
-const controls = {
+const controlsFighter = {
 
 	// bank one is shape switcher
 	setOne: fighter.bankOne.switch,
 	setOneShape: fighter.bankOne.arcade[0].on, // lowest value for buttons
+	setOneShape: akai.bankOne[0].on, // lowest value for buttons
 	setOneReset: fighter.bankOne.side.left[2].on,
 
 	// bank two is shape switcher
@@ -116,7 +161,7 @@ const controls = {
 	// bank four is for grid & transforms
 	shapeControls: fighter.bankFour.switch,
 	// I literally have no idea how to do grids
-	randomiseGrid: fighter.bankFour.arcade[0].on,
+	randomiseGrid: fighter.bankFour.arcade[7].on,
 	squareGrid: fighter.bankFour.arcade[1].on,
 	isoGrid: fighter.bankFour.arcade[2].on,
 	polarGrid: fighter.bankFour.arcade[3].on,
@@ -124,7 +169,69 @@ const controls = {
 	customGridOne: fighter.bankFour.arcade[4].on,
 	customGridTwo: fighter.bankFour.arcade[5].on,
 	customGridThree: fighter.bankFour.arcade[6].on,
-	customGridFour: fighter.bankFour.arcade[7].on
+	customGridFour: fighter.bankFour.arcade[0].on
+}
+
+// See cheat sheets
+const controls = {
+
+	// bank one is shape switcher
+	setOne: akai.bankOne[0].on,
+	setOneShape: akai.bankOne[0].on, // lowest value for buttons
+	setOneReset: akai.bankOne[7].on,
+
+	// bank two is shape switcher
+	setTwo: akai.bankTwo[0].off,
+	setTwoShape: akai.bankTwo[0].on, // lowest value for buttons
+	setTwoReset: akai.bankTwo[7].on,
+
+	// bank three is for colours
+	colourControls: akai.bankThree[0].on,
+	colourCCchannel: akai.bankThree[0].cc,
+	// returns cc vals
+	hueShift: akai.bankThree[0].cc[1],
+	satShift: akai.bankThree[1].cc[1],
+	lumShift: akai.bankThree[2].cc[1],
+	opShift: akai.bankThree[3].cc[1],
+
+	invertOn: akai.bankThree[0].on,
+	invertOff: akai.bankThree[0].off,
+
+	paletteSwitch: akai.bankThree[0].pc, // lowest value for buttons
+
+	blackOut: akai.bankThree[4].on,
+	whiteOut: akai.bankThree[5].on,
+	showScreen: akai.bankThree[6].on,
+
+	resetColours: akai.bankThree[7].on,
+
+	// bank four is for grid & transforms
+	shapeControls: akai.bankFour[0].on,
+	// I literally have no idea how to do grids
+	randomiseGrid: akai.bankFour[0].on,
+	// reset grid
+	// randomise -> off set amount
+	// move grid x
+	// move grid y
+	// move grid both
+	// transition grid
+	// if I can work out a way to transition a grid and put in params rather than setting loads up - that would be better
+
+	squareGrid: akai.bankFour[1].on,
+	isoGrid: akai.bankFour[2].on,
+	polarGrid: akai.bankFour[3].on,
+	// spiral grid
+	// polar moves out
+	// spiral moves around
+	// center
+	// half x
+	// half y
+	// quarter
+
+	customGridOne: akai.bankFour[4].on,
+	customGridTwo: akai.bankFour[5].on,
+	customGridThree: akai.bankFour[6].on,
+	customGridFour: akai.bankFour[7].on
 }
 
 export default controls;

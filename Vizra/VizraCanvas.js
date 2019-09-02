@@ -21,7 +21,7 @@ class VizraCanvas {
 	get centerX() { return this._canvas.width/2; }
 	get centerY() { return this._canvas.height/2; }
 	
-	//TODO
+	// TODO
 	// get pointerX
 	// get pointerY
 	

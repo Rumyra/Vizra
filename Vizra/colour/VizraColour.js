@@ -1,4 +1,10 @@
-// const col = new VizraCol('#000000')
+// Vizra Colour module -> to be used in Vizra Palette module
+
+// const col = new VizraColour('#000000')
+// const col = new VizraColour('hsla(40, 10%, 50%, 1)')
+// const col = new VizraColour({hue: sat: lum: op:})
+// The latter is also what is returned, along with a few methods for lightening, darkening, inverting, transparency & hue rotation
+
 
 // get col.hue/sat/lum/op
 // set col.hue = int
@@ -6,15 +12,36 @@
 // original col.original
 class VizraColour {
 	constructor(col) {
-		this._hex = col;
+		this._orig = col;
 
-		this.col = this._makeHsla(this._hex);
+		// this.col = this._makeHsla(this._orig);
 
 		// return this.col;
 	}
 
+	// if passed in is hex use make hsla function, otherwise is it an hsla string, or is it an hsla object already
+	get col() {
+		const char = this._orig.slice(0, 1);
+		// if hex
+		if (char === '#') {
+			return this._colFromHex(this._orig);
+		} else if (char === 'h') {
+			return this._colFromHsla();
+		} else {
+			return this._orig;
+		}
+	}
+
 	get original() {
-		return this._makeHsla(this._hex);
+		const char = this._orig.slice(0, 1);
+		// if hex
+		if (char === '#') {
+			return this._colFromHex(this._orig);
+		} else if (char === 'h') {
+			return this._colFromHsla();
+		} else {
+			return this._orig;
+		}
 	}
 
 	get hue() {
@@ -97,9 +124,28 @@ class VizraColour {
 		// return 'hello';
     return `hsla(${this.hue}, ${this.sat}%, ${this.lum}%, ${this.op})`;
 	}
+
+	_colFromHsla(hslaString) {
+		let sep = hslaString.indexOf(",") > -1 ? "," : " ";
+	  hslaString = hslaString.substr(5).split(")")[0].split(sep);
+
+	  if (hslaString.indexOf("/") > -1)
+	    hslaString.splice(3,1);
+		
+		let col = {
+			hue: Number(hslaString[0]),
+			sat: Number(hslaString[1].substr(0,hslaString[1].length - 1)),
+			lum: Number(hslaString[2].substr(0,hslaString[2].length - 1)),
+			op: Number(hslaString[3])
+		}
+
+		return col;
+		
+	}
+	
 	// return hsla of colour
 	// takes a hex value and returns it's hsla
-	_makeHsla(hex) {
+	_colFromHex(hex) {
 		let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
 		if (result === null) {
