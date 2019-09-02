@@ -1,12 +1,12 @@
-// Vizra colour module
+import VizraColour from './VizraColour.js';
+
+// Vizra palette module
 
 /* use:
 
-I want two use cases, one enter an array of colours, the other is to auto generate a palette, either based on a colour or not, with a 'light' or 'dark' flag to set background.
-
-Pallettes are made from colour types
-
-Always returns an array of hsla strings
+const palette = new VizraPalette(['#000, #000 ...'])
+const palette = new VizraPalette('blue', 10)
+const palette = new VizraPalette('#111', 5)
 
 palette.back // background colour based on light or dark flag
 palette.fore // foreground colour - usually stroke - based on light or dark flag
@@ -19,23 +19,105 @@ Set hue, sat, light, op values of each col
 addColour
 removeColour
 
-Abstract when creating a Viz to use [0], [1] etc... so you can switch out palettes. This requires a minimum number of colours per palette. Also possibly keep background and line colour out of this library and just have it generate colours - keep that in the Viz.
+palette[3] = 'hsla...' -> resets that one colour
+
+TODO figure out how to put amount of colours in palette
 
 */
 
-// start with a colour class
+// constructor(opts)
+// opts = {arr: , colour: , amountOfCols: , bkgrnd: } -> these may or may not exist - and you can check in the constructor
 
-// then have a palette class which takes colour types
 
-// Use cass one: work with an array of colour values
 class VizraPalette {
 	
-	constructor(colArray, darkBkgrnd = true) {
-		this._origPalette = colArray;
+	constructor(colourOrArr, darkBkgrnd = true) {
+		this._startingCols = colourOrArr;
 		this._darkBkgrnd = darkBkgrnd;
 		
-		// this.palette = this.palette;
+		this.palette = this._palette();
 		
+	}
+
+	// if startingCols is array make new vizcolour and return in new palette
+	// if it's a hex create a new palette based on colour
+	// if it's a string make a palette from that string
+
+	// get palette() {
+	// 	const newPalette = [];
+	// 	this._startingCols.forEach((el, i) => {
+	// 		const col = new VizraColour(el);
+	// 		newPalette.push(col); 
+	// 	});
+	// 	return newPalette;
+	// }
+
+	_palette() {
+		const newPalette = [];
+
+		if (Array.isArray(this._startingCols)) {
+			this._startingCols.forEach((el, i) => {
+				const col = new VizraColour(el);
+				newPalette.push(col);
+			});
+		} else if (this._startingCols.slice(0,1) === '#') {
+			return;
+		} else {
+			this._makePaletteFromCol(this._startingCols);
+		}
+
+			
+		return newPalette;
+	}
+
+	_makePaletteFromCol(col) {
+
+		const newPalette = [];
+
+		// if colour is rainbow, hue rotates
+
+		// else hue is set
+		// default is red
+		let hue = 0;
+
+		switch (col) {
+		  case 'red':
+		  	hue = 0;
+		    break;
+		  case 'orange':
+		  	hue = 40;
+		    break;
+		  case 'yellow':
+		  	hue = 80;
+		    break;
+		  case 'lime':
+		  	hue = 100;
+		    break;
+		  case 'green':
+		  	hue = 150;
+		    break;
+		  case 'turquoise':
+		  	hue = 200;
+		    break;
+		  case 'cyan':
+		  	hue = 220;
+		    break;
+		  case 'blue':
+		  	hue = 250;
+		    break;
+		  case 'indigo':
+		  	hue = 300;
+		    break;
+		  case 'violet':
+		  	hue = 320;
+		    break;
+		  case 'pink':
+		  	hue = 350;
+		    break;
+		}
+
+		return newPalette;
+
 	}
 	
 	// TODO hsla palette based on modified palette NOT original
@@ -47,18 +129,8 @@ class VizraPalette {
 		return newPalette;
 	}
 	
-	get palette() {
-		const newPalette = [];
-		this._origPalette.forEach((el, i) => {
-			newPalette.push(el); 
-		});
-		return newPalette;
-	}
-	
 	get reset() {
-		this.palette.forEach((el, i) => {
-			el.col = el.original;
-		});
+		this.palette = this._palette();
 	}
 	
 	get length() {
@@ -77,7 +149,7 @@ class VizraPalette {
 			}
 		});
 		
-		return lightest.hsla;
+		return lightest;
 	}
 	
 	// rudementary way to get darkest colour
@@ -91,7 +163,7 @@ class VizraPalette {
 			}
 		});
 		
-		return darkest.hsla;
+		return darkest;
 	}
 	
 	get back() {
@@ -140,7 +212,9 @@ class VizraPalette {
 			} else if (hueVal < 0) {
 				hueVal = 360 + hueVal;
 			}
-			el.hue = hueVal;
+			// el.hue = hueVal;
+			this.palette[i].hue = hueVal;
+			// return el.hue;
 		})
 	}
 	

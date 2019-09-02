@@ -11,6 +11,7 @@ import palettes from './setup/palettes.js';
 import grids from './setup/coords.js';
 // viz library
 import vizLibrary from './setup/vizLibrary.js';
+// import * as vizLibrary from './setup/vizLibrary.js';
 
 
 /*
@@ -34,6 +35,8 @@ TODO: refactor the shit outta this
 // ===================== APP SETUP
 
 let viz = vizLibrary[0];
+
+console.log(viz.palette);
 
 // 	// analysis
 // 	// Check audio part below: returns viz.data, viz.bass, viz.hi
@@ -78,43 +81,59 @@ let set = 1;
 function onMIDIMessage(message) {
 	const data = message.data;
 
+	console.log('MIDI message', data);
+
 	// viz.midi.channel = data[0];
 	// viz.midi.note = data[1];
 	// viz.midi.vel = data[2];
 
-	console.log(data);
+
 
 	// if bank one
-	if (data[0] === controls.setOne[0] && data[1] === controls.setOne[1]) {
-		// switchViz(data);
-		set = 1;
-	} else if (data[0] === controls.setTwo[0] && data[1] === controls.setTwo[1]) {
-		set = 2;
-	} else if (data[0] === controls.colourControls[0] && data[1] === controls.colourControls[1]) {
-		set = 3;
-	} else if (data[0] === controls.shapeControls[0] && data[1] === controls.shapeControls[1]) {
-		set = 4;
+	if (data[0] === controls.setOne[0]) {
+		switchViz(data);
+	} else if (
+		(data[0] === controls.colourControls[0]) ||
+		(data[0] === controls.paletteSwitch[0])
+		) {
+		colourFX(data);
+	} else if (data[0] === controls.colourCCchannel[0]) {
+		colourCC(data);
+	} else if (data[0] === controls.shapeControls[0]) {
+		shapeFX(data);
 	}
 
-	// arcade cc switch up
-	switch (set) {
+	// // if bank one
+	// if (data[0] === controls.setOne[0] && data[1] === controls.setOne[1]) {
+	// 	// switchViz(data);
+	// 	set = 1;
+	// } else if (data[0] === controls.setTwo[0] && data[1] === controls.setTwo[1]) {
+	// 	set = 2;
+	// } else if (data[0] === controls.colourControls[0] && data[1] === controls.colourControls[1]) {
+	// 	set = 3;
+	// } else if (data[0] === controls.shapeControls[0] && data[1] === controls.shapeControls[1]) {
+	// 	set = 4;
+	// }
 
-  	case 1:
-  		switchViz(data);
-    break;
+	// // arcade cc switch up
+	// switch (set) {
 
-    case 2:
-  		switchViz(data, 2);
-    break;
+ //  	case 1:
+ //  		switchViz(data);
+ //    break;
 
-    case 3:
-  		colourFX(data);
-    break;
+ //    case 2:
+ //  		switchViz(data, 2);
+ //    break;
 
-    case 4:
-  		shapeFX(data);
-    break;
-  }
+ //    case 3:
+ //  		colourFX(data);
+ //    break;
+
+ //    case 4:
+ //  		shapeFX(data);
+ //    break;
+ //  }
 
 }
 
@@ -133,35 +152,66 @@ function switchViz(message, set = 1) {
 
 }
 
+function colourCC(message) {
+	switch (message[1]) {
+
+  	case controls.hueShift:
+  		viz.palette.setHues( Math.round( Vizra.utils.mapData(message[2], 127, 360) ) );
+  		// console.log(viz.palette);
+    break;
+
+    case controls.satShift:
+    	viz.palette.setSats(Vizra.utils.mapData(message[2], 127, 100)-50 );
+    break;
+
+    case controls.lumShift:
+    	viz.palette.setLums(Vizra.utils.mapData(message[2], 127, 100)-50 );
+    break;
+
+    case controls.opShift:
+    	viz.palette.setOps(Vizra.utils.mapData(message[2], 127, 1) - 0.5 );
+    break;
+  }
+}
+
+let canvasEl = document.querySelector('canvas');
+
 function colourFX(message) {
 
-	// arcade cc switch up
-	if (message[0] === controls.colourCCchannel[0]) {
-		switch (message[1]) {
+	// // arcade cc switch up
+	// if (message[0] === controls.colourCCchannel[0]) {
+	// 	switch (message[1]) {
 
-	  	case controls.hueShift:
-	  		viz.palette.setHues( Math.round( Vizra.utils.mapData(message[2], 127, 360) ) );
-	    break;
+	//   	case controls.hueShift:
+	//   		viz.palette.setHues( Math.round( Vizra.utils.mapData(message[2], 127, 360) ) );
+	//   		// console.log(viz.palette);
+	//     break;
 
-	    case controls.satShift:
-	    	viz.palette.setSats(Vizra.utils.mapData(message[2], 127, 100)-50 );
-	    break;
+	//     case controls.satShift:
+	//     	console.log(message[2]);
+	//     	// viz.palette.setSats(Vizra.utils.mapData(message[2], 127, 100)-50 );
+	//     break;
 
-	    case controls.lumShift:
-	    	viz.palette.setLums(Vizra.utils.mapData(message[2], 127, 100)-50 );
-	    break;
+	//     case controls.lumShift:
+	//     	viz.palette.setLums(Vizra.utils.mapData(message[2], 127, 100)-50 );
+	//     break;
 
-	    case controls.opShift:
-	    	viz.palette.setOps(Vizra.utils.mapData(message[2], 127, 1) - 0.5 );
-	    break;
-	  }
-	}
+	//     case controls.opShift:
+	//     	viz.palette.setOps(Vizra.utils.mapData(message[2], 127, 1) - 0.5 );
+	//     break;
+	//   }
+	// }
 
   // invert on and off
   if (message[0] === controls.invertOn[0] && message[1] === controls.invertOn[1]) {
-  	viz.palette.invert();
-  } else if (message[0] === controls.invertOff[0] && message[1] === controls.invertOff[1]) {
-  	viz.palette.invert();
+  	canvasEl.style.filter = 'invert(100%)';
+  	// viz.palette.invert();
+  	console.log('invert');
+  }
+
+  if (message[0] === 146 && message[1] === 37) {
+  	canvasEl.style.filter = 'invert(0%)';
+  	// viz.palette.invert();
   }
 
   // palette switcher
@@ -224,9 +274,9 @@ function colourFX(message) {
 	}
 
 	// reset palette
-	if (message[0] === controls.resetColours[0] && message[1] === controls.resetColours[1]) {
-		viz.palette.reset;
-	}
+	// if (message[0] === controls.resetColours[0] && message[1] === controls.resetColours[1]) {
+	// 	viz.palette.reset;
+	// }
 
 }
 
@@ -240,7 +290,7 @@ function shapeFX(message) {
 	// square
 	if (message[0] === controls.squareGrid[0] && message[1] === controls.squareGrid[1]) {
 		console.log('grid switch');
-		viz.grid = new Vizra.coords('grid', 'regular');
+		viz.grid = new Vizra.coords('square', 'regular');
 	}
 
 	// triangle
@@ -255,7 +305,7 @@ function shapeFX(message) {
 
 	// X tile
 	if (message[0] === controls.customGridOne[0] && message[1] === controls.customGridOne[1]) {
-		viz.grid = grids.xCoords;
+		viz.grid = grids.triGrid;
 	}
 
 	// center coords
@@ -270,7 +320,7 @@ function shapeFX(message) {
 
 	// quarter coords
 	if (message[0] === controls.customGridFour[0] && message[1] === controls.customGridFour[1]) {
-		viz.grid = grids.quarterCoords;
+		viz.grid = grids.diamondGrid;
 	}
 
 }
@@ -322,18 +372,20 @@ function draw() {
 }
 
 // resume/start
-window.addEventListener("keydown", event => {
-	if (event.code === 'KeyR') {
-		document.querySelector('#message').style.display = 'none';
+// window.addEventListener("keydown", event => {
+// 	if (event.code === 'KeyR') {
+// 		document.querySelector('#message').style.display = 'none';
 
-		// for audio context see params.js
-		// analyser.resume;
+// 		// for audio context see params.js
+// 		// analyser.resume;
 
-		// analyser.getStreamData().then(draw);
+// 		// analyser.getStreamData().then(draw);
 
-		state.resume
-		state.getStreamData().then(draw);
+// 		state.resume
+// 		state.getStreamData().then(draw);
 
-	}
-})
+// 	}
+// })
+
+state.getStreamData().then(draw);
 

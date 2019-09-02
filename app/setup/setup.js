@@ -6,6 +6,8 @@ import palettes from './palettes.js';
 // viz library
 import vizLibrary from './vizLibrary.js';
 
+console.log(palettes[0]);
+
 // purely here for jsconfeu
 let xCoords = [ [20, 20], [50, 50], [100, 50], [200, 50] ];
 
@@ -29,7 +31,7 @@ TODO: refactor the shit outta this
 
 // ===================== APP SETUP
 
-let viz = vizLibrary[0];
+let viz = vizLibrary[1];
 
 // 	// analysis
 // 	// Check audio part below: returns viz.data, viz.bass, viz.hi
@@ -78,7 +80,7 @@ function onMIDIMessage(message) {
 	// viz.midi.note = data[1];
 	// viz.midi.vel = data[2];
 
-	console.log(data);
+	console.log('MIDI message: ', data);
 
 	// if bank one
 	if (data[0] === controls.setOne[0] && data[1] === controls.setOne[1]) {
@@ -194,20 +196,23 @@ function colourFX(message) {
 	switch (message[1]) {
 
 		case paletteStartVal:
-			viz.palette = palettes.jseuAll;
-			console.log('palette one')
+			viz.palette = palettes[0];
+			console.log('palette livejs')
 		break;
 
 		case (paletteStartVal + 1):
-			viz.palette = palettes.jseuSome;
+			viz.palette = palettes[1];
+			console.log('palette asia')
 		break;
 
 		case (paletteStartVal + 2):
-			viz.palette = palettes.liveJS;
+			viz.palette = palettes[2];
+			console.log('palette rainbow')
 		break;
 
 		case (paletteStartVal + 3):
-			viz.palette = palettes.rainbow;
+			viz.palette = palettes[3];
+			console.log('palette something')
 		break;
 
 		case (paletteStartVal + 4):
@@ -255,21 +260,21 @@ function shapeFX(message) {
 	// square
 	if (message === controls.squareGrid) {
 		console.log('grid switch');
-		viz.grid.type = 'grid';
+		viz.grid.type = 'square';
 	}
 
 	// triangle
 	if (message === controls.isoGrid) {
-		viz.grid.type = 'grid';
+		viz.grid.type = 'iso';
 	}
 
 	// polar
 	if (message === controls.polarGrid) {
-		viz.grid.type = 'grid';
+		viz.grid.type = 'polar';
 	}
 
 	// custom -> make this the x for jsconfeu
-	if (message === controls.customGrid) {
+	if (message === controls.customGridOne) {
 		viz.grid = new Vizra.coords('custom', xCoords);
 	}
 

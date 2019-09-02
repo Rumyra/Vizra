@@ -40,11 +40,12 @@ class VizraShape {
 	constructor(position, path, palette) {
 		this.position = position;
 		this.path = path;
+		console.log(position, path, palette);
 		this.fill = palette.back.hsla;
 		this.stroke = palette.fore.hsla;
+		this.strokeWidth = 0.0;
 
 		this.scale = new VizraVector(1, 1);
-		this.strokeWidth = 0.0;
 
 		this.offset = {x: 1, y: 1};
 

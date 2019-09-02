@@ -40,7 +40,10 @@ const grids = {
 		[window.innerWidth*0.25, window.innerHeight*0.25],
 		[window.innerWidth*0.75, window.innerHeight*0.25],
 		[window.innerWidth*0.25, window.innerHeight*0.75],
-		[window.innerWidth*0.75, window.innerHeight*0.75]])
+		[window.innerWidth*0.75, window.innerHeight*0.75]]),
+	triGrid: new Vizra.coords('iso', [200, 200]),
+	diamondGrid: new Vizra.coords('square', [120, 120]),
+	test: new Vizra.coords('square', [20, 20], false)
 }
 
 export default grids;
