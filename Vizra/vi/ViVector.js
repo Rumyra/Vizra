@@ -3,10 +3,10 @@
 // TODO you have got to be able to add static methods to this so you have utility methods for any vector - surely
 // TODO vizra utils is used in this - but I'm pretty sure a static method would work
 
-import vizraUtils from '../vizraUtils.js';
+import utils from '../utils.js';
 
 
-class VizraVector {
+class ViVector {
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
@@ -110,4 +110,4 @@ class VizraVector {
 	// get -> is called when called
 }
 
-export default VizraVector;
+export default ViVector;

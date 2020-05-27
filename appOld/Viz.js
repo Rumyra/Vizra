@@ -51,7 +51,7 @@ class Viz {
 	loop(state) {
 		this.coords.forEach((el, i) => {
 
-			const colour = this.palette.hslaPalette[vizraUtils.randomNumber(0, this.palette.length)];
+			const colour = this.palette.hslaPalette[vizraUtils.randomInt(0, this.palette.length)];
 
 			this.shape.position = el;
 

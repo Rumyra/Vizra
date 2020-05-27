@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: paths.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: paths.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import utils from './utils.js';
+/**
+ * Vizra Paths Library
+ * A bunch of path drawing functions - each returns a Path2D object, starts from (0, 0) which is it's centre
+ * @type {Object}
+ * @author Ruth John
+ * @copyright 2019 Ruth John
+ * @namespace
+ */
+const paths = {
+
+	/**
+	 * @param {int} radius half full size of circle
+	 * @param {int} arcFrom start
+	 * @param {int} arcTo end
+	 * @param {boolean} anticlockwise default is false
+	 */
+	circle: function(radius = 50, arcFrom = 0, arcTo = 360, anticlockwise = false) {
+		let radFrom = utils.degToRad(arcFrom);
+		let radTo = utils.degToRad(arcTo);
+
+		const circlePath = new Path2D();
+		circlePath.arc(0, 0, radius, radFrom, radTo, anticlockwise);
+
+		return circlePath;
+	},
+	/**
+	 *
+	 * @param {int} width pixels
+	 * @param {int} height pixels
+	 * @param {int} rotation degrees
+	 * @param {int} arcFrom degrees
+	 * @param {int} arcTo degreed
+	 * @param {boolean} anticlockwise set false by default
+	 */
+	ellipse: function (width = 100, height = 150, rotation = 0, arcFrom = 0, arcTo = 360, anticlockwise = false) {
+		let radFrom = utils.degToRad(arcFrom);
+		let radTo = utils.degToRad(arcTo);
+
+		const ellipsePath = new Path2D();
+		ellipsePath.arc(0, 0, width, height, radius, radFrom, radTo, anticlockwise);
+
+		return ellipsePath;
+	},
+	/**
+	 *
+	 * @param {int} width pixels
+	 * @param {int} height pixels
+	 */
+	rectangle: function(width = 100, height = 100) {
+		const rectPath = new Path2D();
+		// outline
+		rectPath.moveTo( width/2, height/2 );
+		rectPath.lineTo( -width/2, height/2 );
+		rectPath.lineTo( -width/2, -height/2 );
+		rectPath.lineTo( width/2, -height/2 );
+		rectPath.closePath();
+
+		return rectPath;
+	},
+	/**
+	 *
+	 * @param {int} width pixels
+	 * @param {int} height pixels
+	 * @param {int} thickness pixels how 'thick' the cross is
+	 */
+	cross: function(width = 100, height = 100, thickness = 5) {
+
+		const halfThickness = thickness/2;
+
+		const xPath = new Path2D();
+		xPath.moveTo(-halfThickness, -(height/2));
+		xPath.lineTo(-halfThickness, -halfThickness);
+		xPath.lineTo(-(width/2)-halfThickness, -halfThickness);
+		xPath.lineTo(-(width/2)-halfThickness, halfThickness);
+		xPath.lineTo(-halfThickness, halfThickness);
+		xPath.lineTo(-halfThickness, (height/2));
+		xPath.lineTo(halfThickness, (height/2));
+		xPath.lineTo(halfThickness, halfThickness);
+		xPath.lineTo((width/2), halfThickness);
+		xPath.lineTo((width/2), -halfThickness);
+		xPath.lineTo(halfThickness, -halfThickness);
+		xPath.lineTo(halfThickness, -(height/2));
+		xPath.closePath();
+
+		return xPath;
+	},
+	/**
+	 * @description no params, just a heart
+	 */
+	heart: function() {
+		const heartPath = new Path2D("M0,58.097c0.004-15.985,12.918-28.966,28.904-29.048C28.628,13.283,41.184,0.278,56.95,0.005c0.286-0.006,0.57-0.006,0.856-0.002c16.328-0.062,28.61,12.159,29.051,29.694l0.14,56.329l-56.329,0.138 C12.718,87.021,0.041,74.404,0,58.097");
+
+		return heartPath;
+	},
+	/**
+	 *
+	 * @param {string} style 'plain', 'grid' or 'sliced'
+	 * @param {int} width pixels
+	 * @param {int} height pixels
+	 */
+	diamond: function(style = 'plain', width = 100, height = 100) {
+
+		// outline
+		const diaPath = new Path2D();
+		// context.rect(x, y, size, size);
+		diaPath.moveTo(width/2, 0);
+		diaPath.lineTo(0, height/2);
+		diaPath.lineTo(-width/2, 0);
+		diaPath.lineTo(0, -height/2);
+		diaPath.lineTo(width/2, 0);
+
+		if (style === 'grid' || style === 'sliced') {
+			// grid lines
+			diaPath.moveTo(width/4, height/4);
+			diaPath.lineTo(-(width/4), -height/4);
+			diaPath.moveTo(width/4, -height/4);
+			diaPath.lineTo(-width/4, height/4);
+
+			if (style === 'sliced') {
+				// diagonal lines
+				diaPath.moveTo(width/2, 0);
+				diaPath.lineTo(-width/2, 0);
+				diaPath.moveTo(0, -height/2);
+				diaPath.lineTo(0, height/2);
+			}
+		}
+		diaPath.closePath();
+
+		return diaPath;
+	},
+	/**
+	 *
+	 * @param {int} width pixels
+	 * @param {*} height pixels height will be half
+	 * @description draws a half diamond pointing down
+	 */
+	halfDiamond: function(width = 100, height = 100) {
+
+		const halfDiaPath = new Path2D();
+
+		halfDiaPath.moveTo(width/2, 0);
+		halfDiaPath.lineTo(0, height/2);
+		halfDiaPath.lineTo(-width/2, 0);
+		halfDiaPath.closePath();
+
+		return halfDiaPath;
+	},
+	/**
+	 * @description returns a curved ended cross, no allowance for adjustment
+	 */
+	curvedCross: function() {
+		const cCrossPath = new Path2D("M72.542,30.792h-22.14V9.057c0-5.002-3.997-9.057-9-9.057s-9,4.055-9,9.057v21.734H9.057c-5.002,0-9.057,4.497-9.057,9.5s4.055,9.5,9.057,9.5h23.345v22.75c0,5.003,3.997,9.058,9,9.058s9-4.055,9-9.058v-22.75h22.14c5.003,0,9.058-4.497,9.058-9.5S77.544,30.792,72.542,30.792z");
+
+		return cCrossPath;
+	},
+	/**
+	 *
+	 * @param {int} sideLength pixels
+	 */
+	hexagon: function(sideLength = 60) {
+
+		const triSide = Math.floor(Math.cos(utils.degToRad(30))*sideLength);
+		const half = Math.floor(sideLength/2);
+
+	  const hexPath = new Path2D();
+
+		hexPath.moveTo(0, 0);
+	  hexPath.moveTo(-half, -triSide);
+	  hexPath.lineTo(half, -triSide);
+	  hexPath.lineTo(sideLength, 0);
+	  hexPath.lineTo(half, triSide);
+	  hexPath.lineTo(-half, triSide);
+	  hexPath.lineTo(-sideLength, 0);
+	  hexPath.closePath();
+
+	  return hexPath;
+
+  },
+	/**
+	 *
+	 * @param {boolean} insideLines true by deafult
+	 */
+	lantern: function(insideLines = true) {
+
+		const lanternPath = new Path2D();
+		lanternPath.moveTo(186,44);
+		lanternPath.bezierCurveTo(186,24,150,28,150,8);
+		lanternPath.bezierCurveTo(150,28,114,24,114,44);
+		lanternPath.bezierCurveTo(114,64,150,60,150,80);
+		lanternPath.bezierCurveTo(150,60,186,64,186,44);
+		lanternPath.closePath();
+
+		if (insideLines) {
+			lanternPath.moveTo(150,10);
+			lanternPath.bezierCurveTo(150,30,120,28,120,48);
+			lanternPath.moveTo(150,10);
+			lanternPath.bezierCurveTo(150,30,128,32,128,52);
+			lanternPath.moveTo(150,10);
+			lanternPath.bezierCurveTo(150,30,136,38,136,58);
+			lanternPath.moveTo(150,10);
+			lanternPath.bezierCurveTo(150,30,144,42,144,62);
+			lanternPath.moveTo(150,10);
+			lanternPath.bezierCurveTo(150,30,180,28,180,48);
+			lanternPath.moveTo(150,10);
+			lanternPath.bezierCurveTo(150,30,172,32,172,52);
+			lanternPath.moveTo(150,10);
+			lanternPath.bezierCurveTo(150,30,164,38,164,58);
+			lanternPath.moveTo(150,10);
+			lanternPath.bezierCurveTo(150,30,156,42,156,62);
+		}
+
+		return lanternPath;
+	}
+
+
+}
+
+export default paths;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="paths.html">paths</a></li><li><a href="utils.html">utils</a></li></ul><h3>Classes</h3><ul><li><a href="Canvas.html">Canvas</a></li><li><a href="Vi.html">Vi</a></li><li><a href="ViColour.html">ViColour</a></li><li><a href="VizraCoords.html">VizraCoords</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sun Oct 27 2019 01:08:32 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

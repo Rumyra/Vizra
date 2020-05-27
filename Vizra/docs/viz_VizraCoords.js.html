@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: viz/VizraCoords.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: viz/VizraCoords.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import utils from '../utils.js';
+import ViVector from '../vi/ViVector.js';
+/**
+ * Vizra Coordinate Library: set of methods to return different coords for distributing shapes on canvas
+ * @author Ruth John
+ * @copyright 2019 Ruth John
+ */
+
+ /**
+	* @todo this should _belong_ with a Vi, like a Vi should have an x &amp; y coord, how I don't know yet
+	* It also needs to take a canvas so we have the proper width &amp; height
+	*/
+
+/**
+	* Returns grid distrib
+	* @param {*} [new Canvas] of Canvas type from Canvas.js to allow proper dimensions
+	* @param {String} [type] can be 'square', 'iso', 'polar'. 'size' or 'custom'. 'custom' means an array of coords should be passed into the next argument
+	* @param {String} or {Array} [distribution] can be 'tight', 'regular', 'loose' or 'sloppy'. Determines how close the coords should be on the grid. If 'custom' is set as the grid type, an array of coord pairs should be passed in instead. If 'size' is set one dimentional array of [x, y] size must be specified
+	* @param {Boolean} [extend edges] whether the grid should fill up to the edges of the canvas (if default true), or a calculated gap should show if set to false
+	* @returns {Array} returns an array of Vector objects with x and y properties.
+	* @example
+	* new VizraCoords(canvas, 'grid', 'regular', false) // returns [{x: 10, y: 10}, {x: 20, y: 20}]
+	* new VizraCoords(canvas, 'custom', [[100, 100], [150, 100]]) // returns [{x: 100, y: 100}, {x: 150, y: 100}]
+*/
+
+// TODO pass in an object of options so we can test to see if they are there
+// add in some nice error handling
+// This will eventually create a cluster of vi rather than just coords
+
+class VizraCoords {
+
+	constructor(canvas, type, distrib, extendEdges = true) {
+		this._canvas = canvas;
+		this._type = type;
+		this._distrib = distrib;
+		this._extendEdges = extendEdges;
+
+		// this._resize();
+		// window.addEventListener("resize", () => {
+		// 	this._resize();
+		// 	this.coords = this.getCoords(this._type);
+		// }, false)
+
+		this._xSize = this.xGridSize;
+		this._ySize = this.yGridSize;
+
+		this.coords = this.getCoords(this._type);
+
+	}
+
+	// _resize() {
+	// 	const dpr = window.devicePixelRatio;
+	// 	this._screenWidth = window.innerWidth;
+	// 	this._screenHeight = window.innerHeight;
+	// }
+
+	get xGridSize() {
+
+		if (Array.isArray(this._distrib)) {
+			return this._distrib[0];
+		} else {
+			return this._calculateGridSize(this._distrib);
+		}
+
+	}
+
+	get yGridSize() {
+
+		if (Array.isArray(this._distrib)) {
+			return this._distrib[1];
+		} else {
+			return this._calculateGridSize(this._distrib, false);
+		}
+
+	}
+
+	_calculateGridSize(howRelaxed, dim = 'x') {
+
+		// percentage of space between grid items
+		let space = 8;
+
+		if (howRelaxed === 'tight') {
+			space = 4;
+		} else if (howRelaxed === 'loose') {
+			space = 12;
+		} else if (howRelaxed === 'sloppy') {
+			space = 18;
+		}
+
+		// square?
+		// let's start with square and we can add y later
+		return Math.round(this._canvas.width / 100 * (space * this._canvas.dpr));
+
+		/**
+		 * @todo add y size properly
+		 */
+		// if (dim === 'x') {
+		// 	return Math.round(this._screenWidth/100 * space);
+		// } else if (dim === 'y') {
+		// 	return Math.round(this._screenWidth/100 * space);
+		// }
+
+	}
+
+	getCoords(type) {
+
+		const coords = [];
+
+		if (type === 'square') {
+			// console.log(this._ySize);
+			if (this._extendEdges) {
+				for (let y=0; y&lt;this._canvas.height+this._ySize; y+=this._ySize) {
+					for (let x=0; x&lt;this._canvas.width+this._xSize; x+=this._xSize) {
+							coords.push( new ViVector(x, y) );
+					}
+				}
+			} else {
+				for (let y=this._ySize*1.67; y&lt;this._canvas.height-(this._ySize); y+=this._ySize) {
+					for (let x=this._xSize*1.67; x&lt;this._canvas.width-(this._xSize); x+=this._xSize) {
+							coords.push( new ViVector(x, y) );
+					}
+				}
+			} // if edges
+
+		} else if (type === 'iso') {
+
+			const halfXSize = Math.ceil(this._xSize/2);
+			const halfYSize = Math.ceil(this._ySize/2);
+
+			let yStart = 0
+			let xStart = 0
+			let maxHeight = this._canvas.height+halfYSize;
+			let maxWidth = this._canvas.width+halfXSize;
+			if (this._extendEdges === false) {
+				yStart = halfYSize*1.34;
+				xStart = halfXSize*1.34;
+				maxHeight = this._canvas.height-(halfYSize);
+				maxWidth = this._canvas.width-(halfXSize);
+			}
+
+			for (let y=yStart; y&lt;maxHeight; y+=halfYSize) {
+
+				for (let x=xStart; x&lt;maxWidth; x+=halfXSize) {
+
+					if (utils.chance(yStart / maxHeight)) continue;
+					if (utils.chance(xStart / maxWidth)) continue;
+
+
+					const xRounded = Math.floor(x/halfXSize);
+					const yRounded = Math.floor(y/halfYSize);
+					// both x &amp; y are odd OR both x &amp; y are even, push coords
+					if ( (xRounded%2 === 0 &amp;&amp; yRounded%2 === 0) || (xRounded%2 === 1 &amp;&amp; yRounded%2 === 1) ) {
+						coords.push( new ViVector(x, y) );
+					}
+				}
+
+			}
+
+		} else if (type === 'polar') {
+
+			// need to create offset as will start top left
+			const xOffset = Math.floor(this._canvas.width/2);
+			const yOffset = Math.floor(this._canvas.height/2);
+
+			// y is radius, x is theta (needs to normalise to within 360)
+			let x = 0;
+			let y = 0;
+
+			// set max width for first ring loop
+			const maxWidth = this._canvas.width+this._ySize;
+
+			// jump r -> circles -> extend to screen width
+			for (let r=0; r&lt;maxWidth; r+=this._ySize) {
+				// jump theta o -> angle of distrib -> no bigger than 360
+				const abc = Math.floor(maxWidth/this._ySize);
+				// y = a * cos(2 pi x / b) + c // where a = 13, b = 26, c = 260
+				// const oGap = 360/Math.abs(abc * ( Math.cos( (2*Math.PI*r) / (abc*20) ) )+abc);
+				const oGap = 360/Math.abs(r*abc/100);
+				// console.log(360/Math.abs(r*abc/100));
+					for (let o=1; o&lt;360; o+=oGap) {
+						let rad = utils.degToRad(o)
+						x = (r * Math.cos(rad)) + xOffset;
+						y = (r * Math.sin(rad)) + yOffset;
+						coords.push( new Entity(x, y) );
+					}
+			} // for
+
+		} else if (type === 'custom') {
+			// if type is custom distrib is an array of coord pairs
+			this._distrib.forEach( (el, i) => {
+				coords.push( new ViVector(el[0], el[1]) );
+			} )
+
+		} else {
+			throw new Error('Grid type must be square, iso, polar or custom');
+		}
+
+		return coords;
+	}
+
+	// return square coords
+
+	// return iso coords
+
+	// return polar coords
+
+	// return spiral coords
+
+	scaleGrid(vector = new ViVector(1, 1)) {
+
+
+		this.coords.forEach( (el, i) => {
+
+			if (el.x &lt; this._screenWidth/2) {
+				el.x = el.x - vector.x;
+			} else {
+				el.x = el.x + vector.x;
+			}
+
+			if (el.y &lt; this._screenHeight/2) {
+				el.y = el.y - vector.y;
+			} else {
+				el.y = el.y + vector.y;
+			}
+
+		} )
+	} // scaleGrid
+
+	randomiseGrid() {
+
+		this.coords.forEach( (el, i) => {
+			let randomVecX = utils.randomInt(-10, 10);
+			let randomVecY = utils.randomInt(-10, 10);
+			let newVector = new ViVector(randomVecX, randomVecY);
+			el.add(newVector);
+		} )
+	}
+
+}
+
+export default VizraCoords;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="paths.html">paths</a></li><li><a href="utils.html">utils</a></li></ul><h3>Classes</h3><ul><li><a href="Canvas.html">Canvas</a></li><li><a href="Vi.html">Vi</a></li><li><a href="ViColour.html">ViColour</a></li><li><a href="VizraCoords.html">VizraCoords</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sun Oct 27 2019 01:08:32 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

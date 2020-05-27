@@ -1,0 +1,26 @@
+{
+  "plugins": [],
+  "recurseDepth": 5,
+  "source": {
+    "include": ["Canvas.js", "paths.js", "utils.js", "./vi", "./viz" ],
+    "exclude": ["./tests"],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "sourceType": "module",
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc","closure"]
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
+  },
+  "opts": {
+  	"template": "templates/default",
+    "encoding": "utf8",
+    "destination": "./docs",
+    "recurse": true,
+    "private": true
+  }
+}
