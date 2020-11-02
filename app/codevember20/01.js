@@ -1,12 +1,13 @@
 console.clear();
 
-import VizShape from '../lib/shape/VizShape.js'
-import VizTile from '../lib/shape/VizTile.js'
-import Viz2d from '../lib/canvas/Viz2d.js';
-import paths from '../lib/shape/vizPaths.js';
-import VizGrid from '../lib/physics/VizGrid.js';
-import tinycolor from '../lib/colour/tinyCol.js';
+import VizShape from '../../lib/shape/VizShape.js'
+import VizTile from '../../lib/shape/VizTile.js'
+import Viz2d from '../../lib/canvas/Viz2d.js';
+import paths from '../../lib/shape/vizPaths.js';
+import VizGrid from '../../lib/physics/VizGrid.js';
+import tinycolor from '../../lib/colour/tinyCol.js';
 
+import COLOURPALETTES from '../assets/colour-palettes.js';
 // create a palette
 // var colors = tinycolor.random().analogous(6, 20);
 // var colors = tinycolor.random().monochromatic(6);
@@ -70,9 +71,9 @@ grid.coords.forEach((el, i) => {
 	const tileOptions = {
 		position: [el.x, el.y],
 		size: [el.xSize, el.ySize],
-		scale: [Math.random()+1, Math.random()+1],
+		scale: [Math.random() + 1, Math.random() + 1],
 		rotate: Math.random() * 360,
-		offset: [Math.random()*50, Math.random()*50]
+		offset: [Math.random() * 50, Math.random() * 50]
 	}
 
 	const tile = new VizTile(shapes, tileOptions);
@@ -80,7 +81,7 @@ grid.coords.forEach((el, i) => {
 
 
 	tile.update(vizScreen.ctx);
-} )
+})
 
 // could just be screen.update(grid, tile(s));
 
