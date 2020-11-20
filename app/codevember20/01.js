@@ -1,83 +1,98 @@
 console.clear();
 
-import VizShape from '../../lib/shape/VizShape.js'
+// import VizShape from '../../lib/shape/VizShape.js'
+import { VizShape, VizCircle } from '../../lib/shape/VizShape.js';
 import VizTile from '../../lib/shape/VizTile.js'
 import Viz2d from '../../lib/canvas/Viz2d.js';
 import paths from '../../lib/shape/vizPaths.js';
 import VizGrid from '../../lib/physics/VizGrid.js';
-import tinycolor from '../../lib/colour/tinyCol.js';
 
+// TODO move this into palletts
+import tinycolor from '../../lib/colour/tinyCol.js';
 import COLOURPALETTES from '../assets/colour-palettes.js';
+
+let palette = COLOURPALETTES[26];
+
+palette = palette.map(el => {
+	return tinycolor(el);
+});
+console.log(palette);
 // create a palette
 // var colors = tinycolor.random().analogous(6, 20);
 // var colors = tinycolor.random().monochromatic(6);
 // var colors = tinycolor.random().splitcomplement();
 // var colors = tinycolor.random().triad();
-var colors = tinycolor.random().tetrad();
-var colors = tinycolor.random().tetrad();
-colors.map(function (t) { return t.toHexString(); });
+// var colors = tinycolor.random().tetrad();
+// var colors = tinycolor.random().tetrad();
+// colors.map(function (t) { return t.toHexString(); });
 
-// don't select this, add it to vizcanvas
 const vizScreen = new Viz2d();
 
 const gridOptions = {
 	type: 'square', // square, iso, polar, size, custom
-	dis: 'sloppy', // tight, regular, loose, sloppy, custom = arr, size == arr
-	padding: true, // true or false
-	cluster: 'right', // top, bottom, left, right, center, sides
-	// clusterAmount: 0.8
+	dis: 'loose', // tight, regular, loose, sloppy, custom = arr, size == arr
+	padding: false, // true or false
+	cluster: null, // top, bottom, left, right, center, sides
+	clusterAmount: 0.8
 }
 
 const grid = new VizGrid(vizScreen, gridOptions);
-console.log(grid);
-
-// we want to auto generate tiles, based on different shapes in different positions and with different colours
-// each tile on the grid can be auto generated, what we need is say three shapes, a way of changing their size & position and a colour pallette
-
-// I knid of want to be able to do shapes like this:
-// shapes = [circle, ratri, hex, rect]
-// but also all the control too
-// maube each shape needs exactly the same params and they are acessible - you can be precise about where you want them, what size they are and what colour they are.
-
-
-// let's do a test with just the fill
-// vizScreen.ctx.fillStyle = vizScreen.dots();
-// vizScreen.ctx.arc(50, 50, 200, 0, 5);
-// vizScreen.ctx.fill();
 
 // TODO figure out shape fills
 // TODO can we render tiles offscreen?
-const shapeOptions = {
+const star1opts = {
+	path: paths.flower(60, 5),
 	position: [0, 0],
 	size: [100, 100],
 	// fill: vizScreen.gradient(),
 	// fill: '#00ffee',
-	fill: colors[0],
+	fill: palette[0],
 	stroke: '#8C578A',
 	strokeWidth: 3.0
 }
 
-const diamond = new VizShape(paths.polar(100, 6, 50), shapeOptions);
+const star1 = new VizShape(star1opts);
 
-// TODO sort out paths -> need only circle, radius one, couple of others, maybe a triangle with ratio
-// TODO try them here
-const shapes = [diamond,
-	new VizShape(paths.circle(), shapeOptions)
+const circleOpts = {
+	x: 20,
+	y: 0,
+	w: 50,
+	h: 50,
+	fill: palette[0],
+	stroke: '#8C578A',
+	strokeWidth: 3.0
+}
+
+const circle = new VizCircle(circleOpts);
+
+const shapes = [
+	star1,
+	circle
 ]
 
-// TODO allow for one value in each of the vectors - if there is one value both x & y are the same
+// what we want to do
+// new Tile([
+// 	circle(x, y, w, h, fill, stroke, strokeWidth),
+// 	rect(x, y, w, h, fill, stroke, strokeWidth),
+// ])
+
+// TODO allow for one value in each of the vectors - if there is one value both x & y are the same - infact no arrays, either one or .x .y
 grid.coords.forEach((el, i) => {
 
 	const tileOptions = {
 		position: [el.x, el.y],
 		size: [el.xSize, el.ySize],
-		scale: [Math.random() + 1, Math.random() + 1],
-		rotate: Math.random() * 360,
-		offset: [Math.random() * 50, Math.random() * 50]
+		// scale: [Math.random() + 1, Math.random() + 1],
+		scale: [2, 2],
+		// rotate: Math.random() * 360,
+		// offset: [Math.random() * 50, Math.random() * 50]
 	}
 
 	const tile = new VizTile(shapes, tileOptions);
-	tile.shapes.forEach(el => el.fill = colors[i % colors.length]);
+	tile.shapes.forEach((el) => {
+		const fill = palette[i % palette.length].setAlpha(0.4);
+		el.fill = fill;
+	});
 
 
 	tile.update(vizScreen.ctx);
