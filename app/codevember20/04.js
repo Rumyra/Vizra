@@ -1,7 +1,9 @@
 console.clear();
 
-// import VizShape from '../../lib/shape/VizShape.js'
-import { VizShape, VizCircle, VizRect, VizCross, VizPolar, VizFlower, VizDiamond, VizSVG } from '../../lib/shape/VizShape.js';
+// NB this whole vix could be done with a polar shape - at the moment it is clipped
+
+import utils from '../../lib/utils.js'
+import { VizShape, VizCircle, VizRect, VizCross, VizPolar, VizFlower, VizDiamond, VizSVG, VizDrop } from '../../lib/shape/VizShape.js';
 import VizTile from '../../lib/shape/VizTile.js'
 import Viz2d from '../../lib/canvas/Viz2d.js';
 import VizGrid from '../../lib/physics/VizGrid.js';
@@ -10,12 +12,13 @@ import VizGrid from '../../lib/physics/VizGrid.js';
 import tinycolor from '../../lib/colour/tinyCol.js';
 import COLOURPALETTES from '../assets/colour-palettes.js';
 
-let palette = COLOURPALETTES[26];
+let palette = COLOURPALETTES[3];
 
-palette = palette.map(el => {
-	return tinycolor(el);
-});
+// palette = palette.map(el => {
+// 	return tinycolor(el);
+// });
 console.log(palette);
+
 // create a palette
 // var colors = tinycolor.random().analogous(6, 20);
 // var colors = tinycolor.random().monochromatic(6);
@@ -26,91 +29,59 @@ console.log(palette);
 // colors.map(function (t) { return t.toHexString(); });
 
 const vizScreen = new Viz2d();
+vizScreen.clear(palette[0]);
+
+
+let fills = [
+	palette[1],
+	palette[2],
+	palette[3],
+	vizScreen.dots(10, palette[1], 'hsla(0, 0%, 0%, 0)'),
+	vizScreen.dots(10, palette[2], 'hsla(0, 0%, 0%, 0)'),
+	vizScreen.dots(10, palette[3], 'hsla(0, 0%, 0%, 0)'),
+	vizScreen.lines(10, palette[1], 'hsla(0, 0%, 0%, 0)'),
+	vizScreen.lines(10, palette[2], 'hsla(0, 0%, 0%, 0)'),
+	vizScreen.lines(10, palette[3], 'hsla(0, 0%, 0%, 0)'),
+]
 
 const gridOptions = {
 	type: 'square', // square, iso, polar, size, custom
-	dis: 'sloppy', // tight, regular, loose, sloppy, custom = arr, size == arr
+	dis: 'regular', // tight, regular, loose, sloppy, custom = arr, size == arr
 	padding: false, // true or false
-	cluster: null, // top, bottom, left, right, center, sides
-	clusterAmount: 0.8
+	cluster: 'center', // top, bottom, left, right, center, sides
+	clusterAmount: 0.1
 }
 
 const grid = new VizGrid(vizScreen, gridOptions);
 console.log(grid);
 
+grid.shiftGrid(40);
+
 // TILES ===================
-const rectopts = {
-	x: 0.5,
-	y: 0.5,
-	w: 1,
-	h: 1,
-	fill: palette[0],
-	stroke: '#8C578A',
-	strokeWidth: 3.0
-}
+// TILE 1
+let tile1 = new VizTile({
+	shapes: [
+		new VizCircle(),
+	]
+})
 
-const rectangle = new VizRect(rectopts);
+// clipping
+const clip = new VizPolar({ sides: 6 });
 
-const floweropts = {
-	x: 0.2,
-	y: 0,
-	w: 0.5,
-	h: 0.5,
-	fill: palette[0],
-	stroke: '#8C578A',
-	strokeWidth: 3.0,
-	petals: 3
-}
-
-const flower = new VizFlower(floweropts);
-
-const circleOpts = {
-	x: 0.8,
-	y: 0.8,
-	w: 0.4,
-	h: 0.4,
-	fill: palette[0],
-	stroke: '#8C578A',
-	strokeWidth: 3.0
-}
-
-const circle = new VizCircle(circleOpts);
-
-const shapes = [
-	rectangle,
-	flower,
-	circle
-]
-
-// what we want to do
-// new Tile([
-// 	circle(x, y, w, h, fill, stroke, strokeWidth),
-// 	rect(x, y, w, h, fill, stroke, strokeWidth),
-// ])
-
-// TODO allow for one value in each of the vectors - if there is one value both x & y are the same - infact no arrays, either one or .x .y
+// you could have very random or slightly random for the chance of showing a random tile
 grid.coords.forEach((el, i) => {
 
-	const tileOptions = {
-		shapes: shapes,
-		x: el.x,
-		y: el.y,
-		w: grid.xSize,
-		h: grid.ySize,
-		// scale: [Math.random() + 1, Math.random() + 1],
-		// scale: [2, 2],
-		// rotate: Math.random() * 360,
-		// offset: [Math.random() * 50, Math.random() * 50]
-	}
+	tile1.x = el.x;
+	tile1.y = el.y;
+	tile1.w = grid.xSize * 2 * Math.random();
+	tile1.h = grid.ySize * 2 * Math.random();
 
-	const tile = new VizTile(tileOptions);
-	tile.shapes.forEach((el) => {
-		const fill = palette[i % palette.length].setAlpha(0.4);
-		el.fill = fill;
-	});
+	tile1.clip = clip.path;
+	tile1.shapes[0].fill = fills[utils.randomInt(0, 8)];
+	tile1.scale = 3 * Math.random();
+	tile1.rotate = 36 * Math.random();
 
-
-	tile.update(vizScreen.ctx);
+	tile1.update(vizScreen.ctx);
 })
 
 // could just be screen.update(grid, tile(s));

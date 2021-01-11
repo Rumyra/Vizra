@@ -1,7 +1,7 @@
 console.clear();
 
-// import VizShape from '../../lib/shape/VizShape.js'
-import { VizShape, VizCircle, VizRect, VizCross, VizPolar, VizFlower, VizDiamond, VizSVG } from '../../lib/shape/VizShape.js';
+import utils from '../../lib/utils.js'
+import { VizShape, VizCircle, VizRect, VizCross, VizPolar, VizFlower, VizDiamond, VizSVG, VizDrop } from '../../lib/shape/VizShape.js';
 import VizTile from '../../lib/shape/VizTile.js'
 import Viz2d from '../../lib/canvas/Viz2d.js';
 import VizGrid from '../../lib/physics/VizGrid.js';
@@ -10,7 +10,7 @@ import VizGrid from '../../lib/physics/VizGrid.js';
 import tinycolor from '../../lib/colour/tinyCol.js';
 import COLOURPALETTES from '../assets/colour-palettes.js';
 
-let palette = COLOURPALETTES[26];
+let palette = COLOURPALETTES[20];
 
 palette = palette.map(el => {
 	return tinycolor(el);
@@ -39,17 +39,65 @@ const grid = new VizGrid(vizScreen, gridOptions);
 console.log(grid);
 
 // TILES ===================
-const rectopts = {
-	x: 0.5,
-	y: 0.5,
-	w: 1,
-	h: 1,
-	fill: palette[0],
-	stroke: '#8C578A',
-	strokeWidth: 3.0
-}
+let tiles = [];
+// TILE 1
+let tile1 = new VizTile({
+	shapes: [
+		new VizCircle({ x: 0.5, y: 0.5, w: 1, h: 1, fill: palette[0] }),
+		new VizCircle({ x: 0.5, y: 0.5, w: 0.65, h: 0.65, fill: palette[1] }),
+		new VizDrop({ x: 0.3, y: 0.3, w: 0.6, h: 0.6, rotate: 270, fill: palette[4] }),
+		new VizCircle({ x: 0.5, y: 0.5, w: 0.3, h: 0.3, fill: palette[2] }),
+	]
+})
+tiles.push(tile1);
 
-const rectangle = new VizRect(rectopts);
+// TILE 2
+let tile2 = new VizTile({
+	shapes: [
+		new VizCircle({ x: 0.75, y: 0.25, w: 0.5, fill: palette[0] }),
+		new VizCircle({ x: 0.25, y: 0.75, w: 0.5, fill: palette[3] }),
+		new VizCircle({ x: 0.75, y: 0.75, w: 0.5, fill: palette[2] }),
+		new VizDrop({ x: 0.25, y: 0.25, w: 0.5, h: 0.5, rotate: 270, fill: palette[4] }),
+	]
+})
+tiles.push(tile2);
+
+// TILE 3
+let tile3 = new VizTile({
+	shapes: [
+		// new VizFlower({x: 0.5, y: 0.5, w: 1, h: 1, petals: 1, roundness: 0.9, thickness: 0.6, fill: palette[1], rotate: 40}),
+		new VizDrop({ x: 0.6, y: 0.6, w: 0.8, h: 0.8, fill: palette[2], rotate: 90 }),
+		new VizDrop({ x: 0.7, y: 0.7, w: 0.6, h: 0.6, fill: palette[3], rotate: 90}),
+		new VizDrop({ x: 0.8, y: 0.8, w: 0.4, h: 0.4, fill: palette[4], rotate: 90 }),
+	]
+})
+tiles.push(tile3);
+
+// TILE 4
+let tile4 = new VizTile({
+	shapes: [
+		new VizRect({ x: 0.33, y: 0.33, w: 0.3, h: 0.3, fill: palette[3] }),
+		new VizRect({ x: 0.33, y: 0.33, w: 0.15, h: 0.15, fill: palette[1] }),
+		new VizRect({ x: 0.33, y: 0.67, w: 0.3, h: 0.3, fill: palette[3] }),
+		new VizRect({ x: 0.33, y: 0.67, w: 0.15, h: 0.15, fill: palette[1] }),
+		new VizRect({ x: 0.67, y: 0.33, w: 0.3, h: 0.3, fill: palette[3] }),
+		new VizRect({ x: 0.67, y: 0.33, w: 0.15, h: 0.15, fill: palette[1] }),
+		new VizRect({ x: 0.67, y: 0.67, w: 0.3, h: 0.3, fill: palette[3] }),
+		new VizRect({ x: 0.67, y: 0.67, w: 0.15, h: 0.15, fill: palette[1] }),
+	]
+})
+tiles.push(tile4);
+
+// TILE 5
+let tile5 = new VizTile({
+	shapes: [
+		new VizCircle({ x: 0.5, y: 0.5, w: 0.8, fill: palette[3] }),
+		new VizFlower({x: 0.5, y: 0.5, w: 1, petals: 4, roundness: 0.6, thickness: 0.2, fill: palette[2], rotate: 45})
+
+	]
+})
+tiles.push(tile5);
+
 
 const floweropts = {
 	x: 0.2,
@@ -64,53 +112,19 @@ const floweropts = {
 
 const flower = new VizFlower(floweropts);
 
-const circleOpts = {
-	x: 0.8,
-	y: 0.8,
-	w: 0.4,
-	h: 0.4,
-	fill: palette[0],
-	stroke: '#8C578A',
-	strokeWidth: 3.0
-}
-
-const circle = new VizCircle(circleOpts);
-
-const shapes = [
-	rectangle,
-	flower,
-	circle
-]
-
-// what we want to do
-// new Tile([
-// 	circle(x, y, w, h, fill, stroke, strokeWidth),
-// 	rect(x, y, w, h, fill, stroke, strokeWidth),
-// ])
-
-// TODO allow for one value in each of the vectors - if there is one value both x & y are the same - infact no arrays, either one or .x .y
+// you could have very random or slightly random for the chance of showing a random tile
 grid.coords.forEach((el, i) => {
 
-	const tileOptions = {
-		shapes: shapes,
-		x: el.x,
-		y: el.y,
-		w: grid.xSize,
-		h: grid.ySize,
-		// scale: [Math.random() + 1, Math.random() + 1],
-		// scale: [2, 2],
-		// rotate: Math.random() * 360,
-		// offset: [Math.random() * 50, Math.random() * 50]
-	}
+	const cTileIndex = utils.chance(0.5) ? (i % 4) : utils.randomInt(0, 4);
+	const currentTile = tiles[cTileIndex];
 
-	const tile = new VizTile(tileOptions);
-	tile.shapes.forEach((el) => {
-		const fill = palette[i % palette.length].setAlpha(0.4);
-		el.fill = fill;
-	});
+	currentTile.x = el.x;
+	currentTile.y = el.y;
+	currentTile.w = grid.xSize;
+	currentTile.h = grid.ySize;
+	currentTile.rotate = (utils.randomInt(0, 3) * 90);
 
-
-	tile.update(vizScreen.ctx);
+	currentTile.update(vizScreen.ctx);
 })
 
 // could just be screen.update(grid, tile(s));

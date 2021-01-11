@@ -1,16 +1,19 @@
 console.clear();
 
-// import VizShape from '../../lib/shape/VizShape.js'
-import { VizShape, VizCircle, VizRect, VizCross, VizPolar, VizFlower, VizDiamond, VizSVG } from '../../lib/shape/VizShape.js';
+// TODO I seem to have broken clipping - which doesn't relaly make any sense
+
+import utils from '../../lib/utils.js'
+import { VizShape, VizCircle, VizRect, VizCross, VizPolar, VizFlower, VizDiamond, VizSVG, VizDrop } from '../../lib/shape/VizShape.js';
 import VizTile from '../../lib/shape/VizTile.js'
 import Viz2d from '../../lib/canvas/Viz2d.js';
 import VizGrid from '../../lib/physics/VizGrid.js';
+import SVGPATHS from '../assets/svg-paths.js';
 
 // TODO move this into palletts
 import tinycolor from '../../lib/colour/tinyCol.js';
 import COLOURPALETTES from '../assets/colour-palettes.js';
 
-let palette = COLOURPALETTES[26];
+let palette = COLOURPALETTES[105];
 
 palette = palette.map(el => {
 	return tinycolor(el);
@@ -26,91 +29,56 @@ console.log(palette);
 // colors.map(function (t) { return t.toHexString(); });
 
 const vizScreen = new Viz2d();
+vizScreen.clear(palette[1]);
 
 const gridOptions = {
 	type: 'square', // square, iso, polar, size, custom
-	dis: 'sloppy', // tight, regular, loose, sloppy, custom = arr, size == arr
+	dis: 'loose', // tight, regular, loose, sloppy, custom = arr, size == arr
 	padding: false, // true or false
-	cluster: null, // top, bottom, left, right, center, sides
+	cluster: 'top', // top, bottom, left, right, center, sides
 	clusterAmount: 0.8
 }
 
 const grid = new VizGrid(vizScreen, gridOptions);
 console.log(grid);
 
+grid.shiftGrid(30);
+
 // TILES ===================
-const rectopts = {
-	x: 0.5,
-	y: 0.5,
-	w: 1,
-	h: 1,
-	fill: palette[0],
-	stroke: '#8C578A',
-	strokeWidth: 3.0
-}
+let tiles = [];
+// TILE 1
+let tile1 = new VizTile({
+	shapes: [
+		new VizSVG({ path: SVGPATHS.tressle1, fill: palette[2], w: 100, h: 300 })
+	]
+})
+tiles.push(tile1);
 
-const rectangle = new VizRect(rectopts);
+// TILE 2
+let tile2 = new VizTile({
+	shapes: [
+		new VizSVG({ path: SVGPATHS.tressle2, fill: palette[2], w: 100, h: 300 })
+	]
+})
+tiles.push(tile2);
 
-const floweropts = {
-	x: 0.2,
-	y: 0,
-	w: 0.5,
-	h: 0.5,
-	fill: palette[0],
-	stroke: '#8C578A',
-	strokeWidth: 3.0,
-	petals: 3
-}
 
-const flower = new VizFlower(floweropts);
 
-const circleOpts = {
-	x: 0.8,
-	y: 0.8,
-	w: 0.4,
-	h: 0.4,
-	fill: palette[0],
-	stroke: '#8C578A',
-	strokeWidth: 3.0
-}
-
-const circle = new VizCircle(circleOpts);
-
-const shapes = [
-	rectangle,
-	flower,
-	circle
-]
-
-// what we want to do
-// new Tile([
-// 	circle(x, y, w, h, fill, stroke, strokeWidth),
-// 	rect(x, y, w, h, fill, stroke, strokeWidth),
-// ])
-
-// TODO allow for one value in each of the vectors - if there is one value both x & y are the same - infact no arrays, either one or .x .y
+// you could have very random or slightly random for the chance of showing a random tile
 grid.coords.forEach((el, i) => {
 
-	const tileOptions = {
-		shapes: shapes,
-		x: el.x,
-		y: el.y,
-		w: grid.xSize,
-		h: grid.ySize,
-		// scale: [Math.random() + 1, Math.random() + 1],
-		// scale: [2, 2],
-		// rotate: Math.random() * 360,
-		// offset: [Math.random() * 50, Math.random() * 50]
-	}
+	const cTileIndex = utils.randomInt(0, 1);
+	const currentTile = tiles[cTileIndex];
 
-	const tile = new VizTile(tileOptions);
-	tile.shapes.forEach((el) => {
-		const fill = palette[i % palette.length].setAlpha(0.4);
-		el.fill = fill;
-	});
+	currentTile.x = el.x;
+	currentTile.y = el.y;
+	// currentTile.w = grid.xSize;
+	// currentTile.h = grid.ySize;
+	currentTile.scale = Math.random() * 3;
+	// currentTile.isAlive = utils.chance(0.5);
 
-
-	tile.update(vizScreen.ctx);
+	currentTile.shapes[0].stroke = palette[utils.randomInt(0, 4)];
+	currentTile.update(vizScreen.ctx);
 })
 
 // could just be screen.update(grid, tile(s));
