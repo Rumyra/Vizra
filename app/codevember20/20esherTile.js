@@ -3,7 +3,7 @@ console.clear();
 // I'm going to refactor the grid class - this is a breaking change
 
 import utils from '../../lib/utils.js'
-import { VizShape, VizCircle, VizRect, VizCross, VizPolar, VizFlower, VizDiamond, VizSVG, VizDrop, VizTri } from '../../lib/shape/VizShape.js';
+import { VizShape, VizCircle, VizRect, VizCross, VizPolar, VizFlower, VizDiamond, VizSVG, VizDrop, VizTri, VizEsher } from '../../lib/shape/VizShape.js';
 import VizTile from '../../lib/shape/VizTile.js'
 import Viz2d from '../../lib/canvas/Viz2d.js';
 import VizGrid from '../../lib/physics/VizGrid.js';
@@ -39,7 +39,7 @@ const gridOptions = {
 	offset: 0.5,
 	axis: 'x',
 	dis: [0, 0],
-	disAmount: 0.5
+	falloff: 0.5
 }
 
 const grid = new VizGrid(vizScreen.width, vizScreen.height, gridOptions);
@@ -63,12 +63,12 @@ grid.forEach((el, i) => {
 
 	currentTile.x = el.x;
 	currentTile.y = el.y;
-	currentTile.w = grid.xSize;
-	currentTile.h = grid.ySize;
+	currentTile.w = grid.cw;
+	currentTile.h = grid.ch;
 
-	let size = grid.xSize;
+	let size = grid.cw;
 
-	currentTile.addShape(new VizTri({
+	currentTile.addShape(new VizEsher({
 		x: 0, y: 0, w: size,
 		fill: 'transparent',
 		stroke: palette.removeDark[utils.randomInt(0, 4)],
